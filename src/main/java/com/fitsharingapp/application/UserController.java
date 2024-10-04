@@ -1,6 +1,7 @@
 package com.fitsharingapp.application;
 
-import com.fitsharingapp.domain.user.User;
+import com.fitsharingapp.domain.user.dto.CreateUserDTO;
+import com.fitsharingapp.domain.user.repository.User;
 import com.fitsharingapp.domain.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -8,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping(path = "/users")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -20,8 +21,8 @@ public class UserController {
     }
 
     @PostMapping
-    public User createUser(@RequestBody User user) {
-        return userService.createUser(user);
+    public User createUser(@RequestBody CreateUserDTO createUserDTO) {
+        return userService.createUser(createUserDTO);
     }
 
 }
