@@ -1,12 +1,15 @@
 package com.fitsharingapp.application;
 
-import com.fitsharingapp.domain.relationship.repository.Relationship;
 import com.fitsharingapp.domain.relationship.RelationshipService;
+import com.fitsharingapp.domain.relationship.repository.Relationship;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
+
+import static com.fitsharingapp.common.Constants.FS_USER_ID_HEADER;
+import static org.springframework.http.HttpStatus.*;
 
 @RestController
 @RequestMapping(path = "/relationships")
@@ -15,23 +18,31 @@ public class RelationshipController {
 
     private final RelationshipService relationshipService;
 
-    @PostMapping("/send/{recipientUsername}")
-    public Relationship sendRelationship(@RequestHeader UUID fsUserId, @PathVariable String recipientUsername) {
-        return relationshipService.createRelationship(fsUserId, recipientUsername);
+    @PostMapping("/send/{recipientFsUserId}")
+    @ResponseStatus(CREATED)
+    public Relationship sendRelationshipRequest(@RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId,
+            @PathVariable UUID recipientFsUserId) {
+        return relationshipService.createRelationship(fsUserId, recipientFsUserId);
     }
 
     @PostMapping("/accept/{relationshipId}")
-    public void acceptRelationship(@RequestHeader UUID fsUserId, @PathVariable UUID relationshipId) {
-        relationshipService.acceptRelationship(fsUserId, relationshipId);
+    @ResponseStatus(ACCEPTED)
+    public Relationship acceptRelationshipRequest(@RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId,
+            @PathVariable UUID relationshipId) {
+        return relationshipService.acceptRelationship(fsUserId, relationshipId);
     }
 
     @PostMapping("/reject/{relationshipId}")
-    public void rejectRelationship(@RequestHeader UUID fsUserId, @PathVariable UUID relationshipId) {
+    @ResponseStatus(NO_CONTENT)
+    public void rejectRelationshipRequest(@RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId,
+            @PathVariable UUID relationshipId) {
         relationshipService.rejectRelationship(fsUserId, relationshipId);
     }
 
     @DeleteMapping("/delete/{relationshipId}")
-    public void deleteRelationship(@RequestHeader UUID fsUserId, @PathVariable UUID relationshipId) {
+    @ResponseStatus(NO_CONTENT)
+    public void deleteRelationship(@RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId,
+            @PathVariable UUID relationshipId) {
         relationshipService.deleteRelationship(fsUserId, relationshipId);
     }
 

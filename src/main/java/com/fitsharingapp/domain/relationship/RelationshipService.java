@@ -24,9 +24,9 @@ public class RelationshipService {
     private final RelationshipRepository relationshipRepository;
     private final UserService userService;
 
-    public Relationship createRelationship(UUID senderFsUserId, String recipientUsername) {
-        UUID recipientFsUserId = validateRecipientAndGetFsUserId(recipientUsername);
-        validateRelationship(senderFsUserId, recipientFsUserId);
+    public Relationship createRelationship(UUID senderFsUserId, UUID recipientFsUserId) {
+        validateRecipient(recipientFsUserId);
+        validateRelationshipRequest(senderFsUserId, recipientFsUserId);
         Relationship relationship = Relationship.builder()
                 .id(UUID.randomUUID())
                 .sender(senderFsUserId)
@@ -38,7 +38,7 @@ public class RelationshipService {
         return relationshipRepository.save(relationship);
     }
 
-    public void acceptRelationship(UUID recipient, UUID relationshipId) {
+    public Relationship acceptRelationship(UUID recipient, UUID relationshipId) {
         Relationship relationship = relationshipRepository.findById(relationshipId)
                 .orElseThrow(() -> new ServiceException(ErrorCode.RELATIONSHIP_NOT_FOUND));
         if (!relationship.getRecipient().equals(recipient)) {
@@ -49,7 +49,7 @@ public class RelationshipService {
         }
         relationship.setStatus(ACCEPTED);
         relationship.setUpdatedAt(LocalDateTime.now());
-        relationshipRepository.save(relationship);
+        return relationshipRepository.save(relationship);
     }
 
     public void rejectRelationship(UUID recipient, UUID relationshipId) {
@@ -81,6 +81,10 @@ public class RelationshipService {
         }
     }
 
+    public void deleteAllRelationships(UUID fsUserId) {
+        relationshipRepository.deleteAllBySenderOrRecipient(fsUserId, fsUserId);
+    }
+
     public List<Relationship> getAcceptedRelationships() {
         UUID fsUserId = (UUID) RequestContextHolder.currentRequestAttributes().getAttribute(FS_USER_ID_HEADER, RequestAttributes.SCOPE_REQUEST);
         return relationshipRepository.findAllBySenderOrRecipientAndStatus(fsUserId, fsUserId, ACCEPTED);
@@ -96,13 +100,12 @@ public class RelationshipService {
         return relationshipRepository.findAllBySenderAndStatus(fsUserId, PENDING);
     }
 
-    private UUID validateRecipientAndGetFsUserId(String username) {
-        return userService.getUserByUsername(username)
-                .orElseThrow(() -> new ServiceException(ErrorCode.RECIPIENT_NOT_FOUND))
-                .getFsUserId();
+    private void validateRecipient(UUID fsUserId) {
+        userService.getUserById(fsUserId)
+                .orElseThrow(() -> new ServiceException(ErrorCode.RECIPIENT_NOT_FOUND));
     }
 
-    private void validateRelationship(UUID sender, UUID recipient) {
+    private void validateRelationshipRequest(UUID sender, UUID recipient) {
         if (sender.equals(recipient)) {
             throw new ServiceException(ErrorCode.SELF_RELATIONSHIP);
         }
@@ -113,6 +116,15 @@ public class RelationshipService {
             throw new ServiceException(ErrorCode.PENDING_RELATIONSHIP);
         }
 
+    }
+
+    public void validateRelationship(UUID publisherFsUserId, UUID receiverFsUserId) {
+        if (!relationshipRepository.existsBySenderAndRecipient(publisherFsUserId, receiverFsUserId)) {
+            throw new ServiceException(ErrorCode.RELATIONSHIP_NOT_FOUND);
+        }
+        if (!relationshipRepository.existsBySenderAndRecipientAndStatus(publisherFsUserId, receiverFsUserId, ACCEPTED)) {
+            throw new ServiceException(ErrorCode.NOT_ACCEPTED_RELATIONSHIP);
+        }
     }
 
 }
