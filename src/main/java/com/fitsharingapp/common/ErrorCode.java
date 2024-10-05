@@ -10,7 +10,16 @@ public enum ErrorCode {
 
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "SERVICE-0001", "User not found"),
     NOT_UNIQUE_USERNAME(HttpStatus.BAD_REQUEST, "SERVICE-0002", "Username already exists"),
-    NOT_UNIQUE_EMAIL(HttpStatus.BAD_REQUEST, "SERVICE-0003", "Email already exists");
+    NOT_UNIQUE_EMAIL(HttpStatus.BAD_REQUEST, "SERVICE-0003", "Email already exists"),
+    RELATIONSHIP_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "SERVICE-0004", "Relationship already exists"),
+    PENDING_RELATIONSHIP(HttpStatus.BAD_REQUEST, "SERVICE-0005", "Relationship is pending"),
+    RECIPIENT_NOT_FOUND(HttpStatus.NOT_FOUND, "SERVICE-0006", "Recipient not found"),
+    SELF_RELATIONSHIP(HttpStatus.BAD_REQUEST, "SERVICE-0007", "Self relationship"),
+    RELATIONSHIP_NOT_FOUND(HttpStatus.NOT_FOUND, "SERVICE-0008", "Relationship not found"),
+    USER_IS_NOT_SENDER(HttpStatus.BAD_REQUEST, "SERVICE-0009", "User is not the sender of the relationship"),
+    USER_IS_NOT_RECIPIENT(HttpStatus.BAD_REQUEST, "SERVICE-0010", "User is not the recipient of the relationship"),
+    RELATIONSHIP_HAS_NOT_PENDING_STATUS(HttpStatus.BAD_REQUEST, "SERVICE-0011", "Relationship is not in pending status"),
+    CANNOT_DELETE_RELATIONSHIP(HttpStatus.BAD_REQUEST, "SERVICE-0012", "Cannot delete relationship, relationship is not accepted or user is not the sender");
 
     private final HttpStatus httpStatus;
     private final String code;
