@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com</groupId>
-    <artifactId>fit-sharing-app</artifactId>
+    <artifactId>fit-sharing-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>fit-sharing-app</name>
-    <description>fit-sharing-app</description>
+    <name>fit-sharing-service</name>
+    <description>fit-sharing-service</description>
     <url/>
     <licenses>
         <license/>
