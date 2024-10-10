@@ -42,10 +42,4 @@ public class NewsController {
         newsService.deleteNews(fsUserId, id);
     }
 
-    @DeleteMapping
-    @ResponseStatus(NO_CONTENT)
-    public void deleteAllNews(@RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId) {
-        newsService.deleteAllNews(fsUserId);
-    }
-
 }

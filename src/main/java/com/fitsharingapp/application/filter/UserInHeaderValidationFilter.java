@@ -25,7 +25,7 @@ import static com.fitsharingapp.common.ErrorCode.MISSING_FS_USER_ID_HEADER;
 @Slf4j
 @RequiredArgsConstructor
 @Order(2)
-public class UserInHeaderValidationFilter implements Filter {
+public class UserInHeaderValidationFilter {
 
     private static final Set<String> excludedPaths = new HashSet<>();
     private final UserService userService;
@@ -34,7 +34,6 @@ public class UserInHeaderValidationFilter implements Filter {
         excludedPaths.add("/users");
     }
 
-    @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
             ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;

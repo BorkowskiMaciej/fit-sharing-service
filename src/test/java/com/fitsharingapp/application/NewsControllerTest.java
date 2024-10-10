@@ -32,8 +32,8 @@ public class NewsControllerTest {
     @Test
     void should_CreateNews_When_Requested() {
 
-        User publisher = userService.createUser(new CreateUserDTO("username1", "username1@mail", "firstName", "lastName", 20, "desctiption"));
-        User receiver = userService.createUser(new CreateUserDTO("username2", "username2@mail", "firstName", "lastName", 20, "desctiption"));
+        User publisher = userService.createUser(new CreateUserDTO("username1", "username1@mail", "admin", "firstName", "lastName", 20, "desctiption"));
+        User receiver = userService.createUser(new CreateUserDTO("username2", "username2@mail", "admin", "firstName", "lastName", 20, "desctiption"));
         Relationship relationship = relationshipService.createRelationship(publisher.getFsUserId(), receiver.getFsUserId());
         relationshipService.acceptRelationship(receiver.getFsUserId(), relationship.getId());
         CreateNewsDTO createNewsDTO = new CreateNewsDTO(receiver.getFsUserId(), ActivityType.RUNNING.toString(), "data");

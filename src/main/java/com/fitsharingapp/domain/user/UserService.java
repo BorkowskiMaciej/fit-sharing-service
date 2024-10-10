@@ -7,6 +7,7 @@ import com.fitsharingapp.domain.user.dto.UpdateUserDTO;
 import com.fitsharingapp.domain.user.repository.User;
 import com.fitsharingapp.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -20,6 +21,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
@@ -39,7 +41,11 @@ public class UserService {
         }
         if (userRepository.existsByEmail(createUserDTO.email())) {
             throw new ServiceException(ErrorCode.NOT_UNIQUE_EMAIL);
-        }        return userRepository.save(userMapper.toEntity(createUserDTO));
+        }
+        CreateUserDTO userDtoWithEncodedPassword = createUserDTO.toBuilder()
+                .password(passwordEncoder.encode(createUserDTO.password()))
+                .build();
+        return userRepository.save(userMapper.toEntity(userDtoWithEncodedPassword));
     }
 
     public User updateUser(UUID fsUserId, UpdateUserDTO userUpdateDTO) {

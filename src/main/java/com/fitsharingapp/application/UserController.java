@@ -4,12 +4,12 @@ import com.fitsharingapp.common.ErrorCode;
 import com.fitsharingapp.common.ServiceException;
 import com.fitsharingapp.domain.news.NewsService;
 import com.fitsharingapp.domain.relationship.RelationshipService;
-import com.fitsharingapp.domain.user.dto.CreateUserDTO;
+import com.fitsharingapp.domain.user.UserService;
 import com.fitsharingapp.domain.user.dto.UpdateUserDTO;
 import com.fitsharingapp.domain.user.repository.User;
-import com.fitsharingapp.domain.user.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,9 +31,9 @@ public class UserController {
         return userService.getAllUsers();
     }
 
-    @PostMapping
-    public User createUser(@RequestBody CreateUserDTO createUserDTO) {
-        return userService.createUser(createUserDTO);
+    @GetMapping("/me")
+    public User getAuthenticatedUser() {
+        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
     @PutMapping()
