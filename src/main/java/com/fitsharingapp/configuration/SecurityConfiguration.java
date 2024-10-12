@@ -1,6 +1,7 @@
 package com.fitsharingapp.configuration;
 
-import com.fitsharingapp.security.JwtAuthenticationFilter;
+import com.fitsharingapp.application.filter.UserInHeaderValidationFilter;
+import com.fitsharingapp.application.filter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +24,7 @@ public class SecurityConfiguration {
 
     private final AuthenticationProvider authenticationProvider;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final UserInHeaderValidationFilter userInHeaderValidationFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -40,7 +42,8 @@ public class SecurityConfiguration {
                 .cors()
                 .and()
                 .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(userInHeaderValidationFilter, JwtAuthenticationFilter.class);
 
         return http.build();
     }

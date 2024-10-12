@@ -57,7 +57,7 @@ public class UserController {
     }
 
     @GetMapping("/search")
-    public List<User> getUserBySearchTerm(@RequestParam String searchTerm) {
+    public List<User> getUserBySearchTermWithoutAuthenticated(@RequestParam String searchTerm) {
         return userService.searchByUsernameOrName(searchTerm);
     }
 

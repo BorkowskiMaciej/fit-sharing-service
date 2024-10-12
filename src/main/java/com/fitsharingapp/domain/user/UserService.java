@@ -7,6 +7,7 @@ import com.fitsharingapp.domain.user.dto.UpdateUserDTO;
 import com.fitsharingapp.domain.user.repository.User;
 import com.fitsharingapp.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +33,8 @@ public class UserService {
     }
 
     public List<User> searchByUsernameOrName(String searchTerm) {
-        return userRepository.searchByUsernameOrName(searchTerm);
+        User authenticated = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return userRepository.searchByUsernameOrName(searchTerm, authenticated.getFsUserId());
     }
 
     public User createUser(CreateUserDTO createUserDTO) {

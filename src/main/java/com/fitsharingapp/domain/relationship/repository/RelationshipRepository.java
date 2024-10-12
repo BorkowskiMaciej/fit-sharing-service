@@ -3,8 +3,7 @@ package com.fitsharingapp.domain.relationship.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Repository
 public interface RelationshipRepository extends JpaRepository<Relationship, UUID> {
@@ -16,8 +15,8 @@ public interface RelationshipRepository extends JpaRepository<Relationship, UUID
 
     List<Relationship> findAllBySenderAndStatus(UUID sender, RelationshipStatus status);
 
-    List<Relationship> findAllBySenderOrRecipientAndStatus(UUID sender, UUID recipient, RelationshipStatus status);
-
     void deleteAllBySenderOrRecipient(UUID fsUserId, UUID fsUserId1);
+
+    Optional<Relationship> findBySenderAndRecipientAndStatusNot(UUID fsUserId, UUID friendFsUserId, RelationshipStatus status);
 
 }

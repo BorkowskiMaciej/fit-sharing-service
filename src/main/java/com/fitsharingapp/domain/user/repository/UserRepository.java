@@ -13,10 +13,13 @@ import java.util.UUID;
 public interface UserRepository extends JpaRepository<User, UUID> {
 
     @Query("SELECT u FROM User u WHERE " +
-            "LOWER(u.username) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+            "(LOWER(u.username) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
             "LOWER(u.firstName) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
-            "LOWER(u.lastName) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
-    List<User> searchByUsernameOrName(@Param("searchTerm") String searchTerm);
+            "LOWER(u.lastName) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) AND " +
+            "u.fsUserId != :authenticatedUserId")
+    List<User> searchByUsernameOrName(
+            @Param("searchTerm") String searchTerm,
+            @Param("authenticatedUserId") UUID authenticatedUserId);
 
     boolean existsByUsername(String username);
 

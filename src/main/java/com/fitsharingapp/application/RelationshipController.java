@@ -46,18 +46,24 @@ public class RelationshipController {
         relationshipService.deleteRelationship(fsUserId, relationshipId);
     }
 
-    @GetMapping
-    public List<Relationship> getRelationships() {
+    @GetMapping("/{friendFsUserId}")
+    public Relationship getRelationship(@RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId,
+            @PathVariable UUID friendFsUserId) {
+        return relationshipService.getLastRelationship(fsUserId, friendFsUserId);
+    }
+
+    @GetMapping("/accepted")
+    public List<RelationshipResponse> getRelationships() {
         return relationshipService.getAcceptedRelationships();
     }
 
     @GetMapping("/received")
-    public List<Relationship> getReceivedRequests() {
+    public List<RelationshipResponse> getReceivedRequests() {
         return relationshipService.getReceivedRelationshipRequests();
     }
 
     @GetMapping("/sent")
-    public List<Relationship> getSentRequests() {
+    public List<RelationshipResponse> getSentRequests() {
         return relationshipService.getSentRelationshipRequests();
     }
 

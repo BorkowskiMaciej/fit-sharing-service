@@ -1,5 +1,8 @@
-package com.fitsharingapp.security;
+package com.fitsharingapp.application.filter;
 
+import com.fitsharingapp.common.ErrorCode;
+import com.fitsharingapp.common.ServiceException;
+import com.fitsharingapp.security.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,6 +20,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import static com.fitsharingapp.common.Constants.AUTHORIZATION_HEADER;
 import static com.fitsharingapp.common.Constants.AUTHORIZATION_HEADER_PREFIX;
@@ -28,22 +33,32 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final HandlerExceptionResolver handlerExceptionResolver;
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    private static final Set<String> excludedPaths = new HashSet<>();
+
+    static {
+        excludedPaths.add("/auth/login");
+        excludedPaths.add("/auth/register");
+    }
 
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain) throws ServletException, IOException {
-        final String authorizationHeader = request.getHeader(AUTHORIZATION_HEADER);
 
-        if (authorizationHeader == null || !authorizationHeader.startsWith(AUTHORIZATION_HEADER_PREFIX)) {
+        if (excludedPaths.contains(request.getRequestURI())) {
             filterChain.doFilter(request, response);
             return;
         }
 
+        String authorizationHeader = request.getHeader(AUTHORIZATION_HEADER);
+        if (authorizationHeader == null || !authorizationHeader.startsWith(AUTHORIZATION_HEADER_PREFIX)) {
+            throw new ServiceException(ErrorCode.MISSING_AUTHORIZATION_HEADER);
+        }
+
         try {
-            final String jwt = authorizationHeader.substring(7);
-            final String username = jwtService.extractUsername(jwt);
+            String jwt = authorizationHeader.substring(7);
+            String username = jwtService.extractUsername(jwt);
 
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
