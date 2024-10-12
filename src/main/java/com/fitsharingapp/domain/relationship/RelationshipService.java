@@ -9,15 +9,12 @@ import com.fitsharingapp.domain.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import static com.fitsharingapp.common.Constants.FS_USER_ID_HEADER;
 import static com.fitsharingapp.domain.relationship.repository.RelationshipStatus.*;
 
 @Service
@@ -90,30 +87,32 @@ public class RelationshipService {
         relationshipRepository.deleteAllBySenderOrRecipient(fsUserId, fsUserId);
     }
 
-    public List<RelationshipResponse> getAcceptedRelationships() {
-        UUID fsUserId = (UUID) RequestContextHolder.currentRequestAttributes().getAttribute(FS_USER_ID_HEADER, RequestAttributes.SCOPE_REQUEST);
+    public Relationship getActiveRelationship(UUID fsUserId, UUID friendFsUserId) {
+        return relationshipRepository.findBySenderAndRecipientAndStatusNot(fsUserId, friendFsUserId, REJECTED)
+                .or(() -> relationshipRepository.findBySenderAndRecipientAndStatusNot(friendFsUserId, fsUserId, REJECTED))
+                .orElseThrow(() -> new ServiceException(ErrorCode.RELATIONSHIP_NOT_FOUND));
+
+    }
+
+    public List<RelationshipResponse> getAcceptedRelationships(UUID fsUserId) {
         return Stream.concat(
                 relationshipRepository.findAllByRecipientAndStatus(fsUserId, ACCEPTED)
                         .stream()
-                        .map(relationship -> relationshipMapper.toRelationshipResponse(relationship, userService.getUserById(relationship.getSender()).orElseThrow()))
-                        .peek(relationshipResponse -> log.info("{}", relationshipResponse.toString())),
+                        .map(relationship -> relationshipMapper.toRelationshipResponse(relationship, userService.getUserById(relationship.getSender()).orElseThrow())),
                 relationshipRepository.findAllBySenderAndStatus(fsUserId, ACCEPTED)
                         .stream()
-                        .map(relationship -> relationshipMapper.toRelationshipResponse(relationship, userService.getUserById(relationship.getRecipient()).orElseThrow()))
-                        .peek(relationshipResponse -> log.info("{}", relationshipResponse.toString())))
+                        .map(relationship -> relationshipMapper.toRelationshipResponse(relationship, userService.getUserById(relationship.getRecipient()).orElseThrow())))
                 .toList();
     }
 
-    public List<RelationshipResponse> getReceivedRelationshipRequests() {
-        UUID fsUserId = (UUID) RequestContextHolder.currentRequestAttributes().getAttribute(FS_USER_ID_HEADER, RequestAttributes.SCOPE_REQUEST);
+    public List<RelationshipResponse> getReceivedRelationshipRequests(UUID fsUserId) {
         return relationshipRepository.findAllByRecipientAndStatus(fsUserId, PENDING)
                 .stream()
                 .map(relationship -> relationshipMapper.toRelationshipResponse(relationship, userService.getUserById(relationship.getSender()).orElseThrow()))
                 .toList();
     }
 
-    public List<RelationshipResponse> getSentRelationshipRequests() {
-        UUID fsUserId = (UUID) RequestContextHolder.currentRequestAttributes().getAttribute(FS_USER_ID_HEADER, RequestAttributes.SCOPE_REQUEST);
+    public List<RelationshipResponse> getSentRelationshipRequests(UUID fsUserId) {
         return relationshipRepository.findAllBySenderAndStatus(fsUserId, PENDING)
                 .stream()
                 .map(relationship -> relationshipMapper.toRelationshipResponse(relationship, userService.getUserById(relationship.getRecipient()).orElseThrow()))
@@ -150,11 +149,6 @@ public class RelationshipService {
         }
     }
 
-    public Relationship getLastRelationship(UUID fsUserId, UUID friendFsUserId) {
-        return relationshipRepository.findBySenderAndRecipientAndStatusNot(fsUserId, friendFsUserId, REJECTED)
-                .or(() -> relationshipRepository.findBySenderAndRecipientAndStatusNot(friendFsUserId, fsUserId, REJECTED))
-                .orElseThrow(() -> new ServiceException(ErrorCode.RELATIONSHIP_NOT_FOUND));
 
-    }
 
 }
