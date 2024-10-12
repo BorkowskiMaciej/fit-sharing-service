@@ -1,4 +1,4 @@
-package com.fitsharingapp.application;
+package com.fitsharingapp.application.relationship;
 
 import com.fitsharingapp.domain.relationship.RelationshipService;
 import com.fitsharingapp.domain.relationship.repository.Relationship;

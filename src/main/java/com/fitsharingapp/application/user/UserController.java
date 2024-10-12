@@ -1,11 +1,11 @@
-package com.fitsharingapp.application;
+package com.fitsharingapp.application.user;
 
 import com.fitsharingapp.common.ErrorCode;
 import com.fitsharingapp.common.ServiceException;
 import com.fitsharingapp.domain.news.NewsService;
 import com.fitsharingapp.domain.relationship.RelationshipService;
 import com.fitsharingapp.domain.user.UserService;
-import com.fitsharingapp.domain.user.dto.UpdateUserDTO;
+import com.fitsharingapp.application.user.dto.UpdateUserRequest;
 import com.fitsharingapp.domain.user.repository.User;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +38,7 @@ public class UserController {
 
     @PutMapping()
     public User updateUser(@RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId,
-            @RequestBody UpdateUserDTO userUpdateDTO) {
+            @RequestBody UpdateUserRequest userUpdateDTO) {
         return userService.updateUser(fsUserId, userUpdateDTO);
     }
 

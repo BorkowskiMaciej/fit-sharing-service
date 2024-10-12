@@ -1,6 +1,6 @@
-package com.fitsharingapp.domain.user.dto;
+package com.fitsharingapp.application.user.dto;
 
-public record UpdateUserDTO(
+public record UpdateUserRequest(
         String firstName,
         String lastName,
         int age,

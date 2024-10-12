@@ -1,8 +1,8 @@
-package com.fitsharingapp.domain.news.dto;
+package com.fitsharingapp.application.news;
 
 import java.util.UUID;
 
-public record CreateNewsDTO(
+public record CreateNewsRequest(
 
         UUID receiverFsUserId,
         String activityType,

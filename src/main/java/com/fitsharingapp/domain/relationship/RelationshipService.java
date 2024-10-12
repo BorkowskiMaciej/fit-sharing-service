@@ -1,6 +1,6 @@
 package com.fitsharingapp.domain.relationship;
 
-import com.fitsharingapp.application.RelationshipResponse;
+import com.fitsharingapp.application.relationship.RelationshipResponse;
 import com.fitsharingapp.common.ErrorCode;
 import com.fitsharingapp.common.ServiceException;
 import com.fitsharingapp.domain.relationship.repository.Relationship;

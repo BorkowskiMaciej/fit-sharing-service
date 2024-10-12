@@ -2,8 +2,8 @@ package com.fitsharingapp.domain.user;
 
 import com.fitsharingapp.common.ErrorCode;
 import com.fitsharingapp.common.ServiceException;
-import com.fitsharingapp.domain.user.dto.CreateUserDTO;
-import com.fitsharingapp.domain.user.dto.UpdateUserDTO;
+import com.fitsharingapp.application.user.dto.CreateUserRequest;
+import com.fitsharingapp.application.user.dto.UpdateUserRequest;
 import com.fitsharingapp.domain.user.repository.User;
 import com.fitsharingapp.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -37,20 +37,20 @@ public class UserService {
         return userRepository.searchByUsernameOrName(searchTerm, authenticated.getFsUserId());
     }
 
-    public User createUser(CreateUserDTO createUserDTO) {
-        if (userRepository.existsByUsername(createUserDTO.username())) {
+    public User createUser(CreateUserRequest createUserRequest) {
+        if (userRepository.existsByUsername(createUserRequest.username())) {
             throw new ServiceException(ErrorCode.NOT_UNIQUE_USERNAME);
         }
-        if (userRepository.existsByEmail(createUserDTO.email())) {
+        if (userRepository.existsByEmail(createUserRequest.email())) {
             throw new ServiceException(ErrorCode.NOT_UNIQUE_EMAIL);
         }
-        CreateUserDTO userDtoWithEncodedPassword = createUserDTO.toBuilder()
-                .password(passwordEncoder.encode(createUserDTO.password()))
+        CreateUserRequest userDtoWithEncodedPassword = createUserRequest.toBuilder()
+                .password(passwordEncoder.encode(createUserRequest.password()))
                 .build();
         return userRepository.save(userMapper.toEntity(userDtoWithEncodedPassword));
     }
 
-    public User updateUser(UUID fsUserId, UpdateUserDTO userUpdateDTO) {
+    public User updateUser(UUID fsUserId, UpdateUserRequest userUpdateDTO) {
         User user = userRepository.findById(fsUserId)
                 .orElseThrow(() -> new ServiceException(ErrorCode.USER_NOT_FOUND));
         user.setFirstName(userUpdateDTO.firstName());

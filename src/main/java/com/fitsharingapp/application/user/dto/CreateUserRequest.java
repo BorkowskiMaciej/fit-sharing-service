@@ -1,9 +1,9 @@
-package com.fitsharingapp.domain.user.dto;
+package com.fitsharingapp.application.user.dto;
 
 import lombok.Builder;
 
 @Builder(toBuilder = true)
-public record CreateUserDTO(
+public record CreateUserRequest(
 
         String username,
         String email,

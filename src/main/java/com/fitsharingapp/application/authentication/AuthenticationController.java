@@ -1,7 +1,9 @@
 package com.fitsharingapp.application.authentication;
 
+import com.fitsharingapp.application.authentication.dto.LoginRequest;
+import com.fitsharingapp.application.authentication.dto.LoginResponse;
 import com.fitsharingapp.domain.user.UserService;
-import com.fitsharingapp.domain.user.dto.CreateUserDTO;
+import com.fitsharingapp.application.user.dto.CreateUserRequest;
 import com.fitsharingapp.domain.user.repository.User;
 import com.fitsharingapp.security.JwtService;
 import lombok.RequiredArgsConstructor;
@@ -20,13 +22,13 @@ public class AuthenticationController {
 
     @PostMapping("/register")
     @ResponseStatus(CREATED)
-    public User register(@RequestBody CreateUserDTO createUserDTO) {
-        return userService.createUser(createUserDTO);
+    public User register(@RequestBody CreateUserRequest createUserRequest) {
+        return userService.createUser(createUserRequest);
     }
 
     @PostMapping("/login")
-    public LoginResponse login(@RequestBody LoginUserDTO loginUserDto) {
-        User user = authenticationService.authenticate(loginUserDto);
+    public LoginResponse login(@RequestBody LoginRequest loginRequest) {
+        User user = authenticationService.authenticate(loginRequest);
         return new LoginResponse(
                 user.getFsUserId(),
                 jwtService.generateToken(user),

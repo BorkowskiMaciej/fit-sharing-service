@@ -1,12 +1,12 @@
 package com.fitsharingapp.application;
 
 import com.fitsharingapp.EnableIntegrationContext;
-import com.fitsharingapp.domain.news.dto.CreateNewsDTO;
+import com.fitsharingapp.application.news.CreateNewsRequest;
 import com.fitsharingapp.domain.news.repository.ActivityType;
 import com.fitsharingapp.domain.relationship.RelationshipService;
 import com.fitsharingapp.domain.relationship.repository.Relationship;
 import com.fitsharingapp.domain.user.UserService;
-import com.fitsharingapp.domain.user.dto.CreateUserDTO;
+import com.fitsharingapp.application.user.dto.CreateUserRequest;
 import com.fitsharingapp.domain.user.repository.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,17 +32,18 @@ public class NewsControllerTest {
     @Test
     void should_CreateNews_When_Requested() {
 
-        User publisher = userService.createUser(new CreateUserDTO("username1", "username1@mail", "admin", "firstName", "lastName", 20, "desctiption"));
-        User receiver = userService.createUser(new CreateUserDTO("username2", "username2@mail", "admin", "firstName", "lastName", 20, "desctiption"));
+        User publisher = userService.createUser(new CreateUserRequest("username1", "username1@mail", "admin", "firstName", "lastName", 20, "desctiption"));
+        User receiver = userService.createUser(new CreateUserRequest("username2", "username2@mail", "admin", "firstName", "lastName", 20, "desctiption"));
         Relationship relationship = relationshipService.createRelationship(publisher.getFsUserId(), receiver.getFsUserId());
         relationshipService.acceptRelationship(receiver.getFsUserId(), relationship.getId());
-        CreateNewsDTO createNewsDTO = new CreateNewsDTO(receiver.getFsUserId(), ActivityType.RUNNING.toString(), "data");
+        CreateNewsRequest
+                createNewsRequest = new CreateNewsRequest(receiver.getFsUserId(), ActivityType.RUNNING.toString(), "data");
 
         webTestClient.post()
                 .uri("/news")
                 .header(FS_USER_ID_HEADER, publisher.getFsUserId().toString())
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(createNewsDTO)
+                .bodyValue(createNewsRequest)
                 .exchange()
                 .expectStatus().isCreated();
     }

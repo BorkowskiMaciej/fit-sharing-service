@@ -1,4 +1,4 @@
-package com.fitsharingapp.application.authentication;
+package com.fitsharingapp.application.authentication.dto;
 
 import java.util.UUID;
 

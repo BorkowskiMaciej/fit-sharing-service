@@ -2,7 +2,7 @@ package com.fitsharingapp.domain.news;
 
 import com.fitsharingapp.common.ErrorCode;
 import com.fitsharingapp.common.ServiceException;
-import com.fitsharingapp.domain.news.dto.CreateNewsDTO;
+import com.fitsharingapp.application.news.CreateNewsRequest;
 import com.fitsharingapp.domain.news.repository.ActivityType;
 import com.fitsharingapp.domain.news.repository.News;
 import com.fitsharingapp.domain.news.repository.NewsRepository;
@@ -26,7 +26,7 @@ public class NewsService {
     private final UserService userService;
     private final RelationshipService relationshipService;
 
-    public News createNews(UUID fsUserId, CreateNewsDTO newsDTO) {
+    public News createNews(UUID fsUserId, CreateNewsRequest newsDTO) {
         userService.validateUser(newsDTO.receiverFsUserId(), RECEIVER_NOT_FOUND);
         relationshipService.validateRelationship(fsUserId, newsDTO.receiverFsUserId());
         ActivityType activityType = ActivityType.validateAndGet(newsDTO.activityType());

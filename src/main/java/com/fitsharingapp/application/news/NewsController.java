@@ -1,7 +1,6 @@
-package com.fitsharingapp.application;
+package com.fitsharingapp.application.news;
 
 import com.fitsharingapp.domain.news.NewsService;
-import com.fitsharingapp.domain.news.dto.CreateNewsDTO;
 import com.fitsharingapp.domain.news.repository.News;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +21,8 @@ public class NewsController {
 
     @PostMapping
     @ResponseStatus(CREATED)
-    public News createNews(@RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId, @RequestBody CreateNewsDTO newsDTO) {
+    public News createNews(@RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId, @RequestBody
+    CreateNewsRequest newsDTO) {
         return newsService.createNews(fsUserId, newsDTO);
     }
 
