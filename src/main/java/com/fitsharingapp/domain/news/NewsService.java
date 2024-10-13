@@ -1,9 +1,8 @@
 package com.fitsharingapp.domain.news;
 
+import com.fitsharingapp.application.news.CreateNewsRequest;
 import com.fitsharingapp.common.ErrorCode;
 import com.fitsharingapp.common.ServiceException;
-import com.fitsharingapp.application.news.CreateNewsRequest;
-import com.fitsharingapp.domain.news.repository.ActivityType;
 import com.fitsharingapp.domain.news.repository.News;
 import com.fitsharingapp.domain.news.repository.NewsRepository;
 import com.fitsharingapp.domain.relationship.RelationshipService;
@@ -29,8 +28,7 @@ public class NewsService {
     public News createNews(UUID fsUserId, CreateNewsRequest newsDTO) {
         userService.validateUser(newsDTO.receiverFsUserId(), RECEIVER_NOT_FOUND);
         relationshipService.validateRelationship(fsUserId, newsDTO.receiverFsUserId());
-        ActivityType activityType = ActivityType.validateAndGet(newsDTO.activityType());
-        return newsRepository.save(newsMapper.toEntity(newsDTO, fsUserId, activityType));
+        return newsRepository.save(newsMapper.toEntity(newsDTO, fsUserId));
     }
 
     public List<News> getAllPublishedNews(UUID fsUserId) {

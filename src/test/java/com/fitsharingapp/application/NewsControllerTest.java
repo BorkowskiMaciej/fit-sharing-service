@@ -2,11 +2,10 @@ package com.fitsharingapp.application;
 
 import com.fitsharingapp.EnableIntegrationContext;
 import com.fitsharingapp.application.news.CreateNewsRequest;
-import com.fitsharingapp.domain.news.repository.ActivityType;
+import com.fitsharingapp.application.user.dto.CreateUserRequest;
 import com.fitsharingapp.domain.relationship.RelationshipService;
 import com.fitsharingapp.domain.relationship.repository.Relationship;
 import com.fitsharingapp.domain.user.UserService;
-import com.fitsharingapp.application.user.dto.CreateUserRequest;
 import com.fitsharingapp.domain.user.repository.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +36,7 @@ public class NewsControllerTest {
         Relationship relationship = relationshipService.createRelationship(publisher.getFsUserId(), receiver.getFsUserId());
         relationshipService.acceptRelationship(receiver.getFsUserId(), relationship.getId());
         CreateNewsRequest
-                createNewsRequest = new CreateNewsRequest(receiver.getFsUserId(), ActivityType.RUNNING.toString(), "data");
+                createNewsRequest = new CreateNewsRequest(receiver.getFsUserId(), "data");
 
         webTestClient.post()
                 .uri("/news")
