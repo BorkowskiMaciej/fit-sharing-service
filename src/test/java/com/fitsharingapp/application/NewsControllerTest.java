@@ -1,7 +1,7 @@
 package com.fitsharingapp.application;
 
 import com.fitsharingapp.EnableIntegrationContext;
-import com.fitsharingapp.application.news.CreateNewsRequest;
+import com.fitsharingapp.application.news.dto.CreateNewsRequest;
 import com.fitsharingapp.application.user.dto.CreateUserRequest;
 import com.fitsharingapp.domain.relationship.RelationshipService;
 import com.fitsharingapp.domain.relationship.repository.Relationship;

@@ -68,7 +68,7 @@ public class RelationshipService {
         relationshipRepository.save(relationship);
     }
 
-    public void deleteRelationship(UUID fsUserId, UUID relationshipId) {
+    public Relationship deleteRelationship(UUID fsUserId, UUID relationshipId) {
         Relationship relationship = relationshipRepository.findById(relationshipId)
                 .orElseThrow(() -> new ServiceException(ErrorCode.RELATIONSHIP_NOT_FOUND));
         if (relationship.getStatus() == ACCEPTED) {
@@ -81,6 +81,7 @@ public class RelationshipService {
         } else {
             throw new ServiceException(ErrorCode.CANNOT_DELETE_RELATIONSHIP);
         }
+        return relationship;
     }
 
     public void deleteAllRelationships(UUID fsUserId) {
@@ -144,11 +145,20 @@ public class RelationshipService {
         if (!relationshipRepository.existsBySenderAndRecipient(publisherFsUserId, receiverFsUserId)) {
             throw new ServiceException(ErrorCode.RELATIONSHIP_NOT_FOUND);
         }
-        if (!relationshipRepository.existsBySenderAndRecipientAndStatus(publisherFsUserId, receiverFsUserId, ACCEPTED)) {
-            throw new ServiceException(ErrorCode.NOT_ACCEPTED_RELATIONSHIP);
+        if (!relationshipRepository.existsBySenderAndRecipient(receiverFsUserId, publisherFsUserId)) {
+            throw new ServiceException(ErrorCode.RELATIONSHIP_NOT_FOUND);
         }
     }
 
-
+    public List<UUID> getFriends(UUID fsUserId) {
+        return Stream.concat(
+                relationshipRepository.findAllByRecipientAndStatus(fsUserId, ACCEPTED)
+                        .stream()
+                        .map(Relationship::getSender),
+                relationshipRepository.findAllBySenderAndStatus(fsUserId, ACCEPTED)
+                        .stream()
+                        .map(Relationship::getRecipient))
+                .toList();
+    }
 
 }

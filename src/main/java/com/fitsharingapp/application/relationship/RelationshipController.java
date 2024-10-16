@@ -1,5 +1,6 @@
 package com.fitsharingapp.application.relationship;
 
+import com.fitsharingapp.domain.news.NewsService;
 import com.fitsharingapp.domain.relationship.RelationshipService;
 import com.fitsharingapp.domain.relationship.repository.Relationship;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import static org.springframework.http.HttpStatus.*;
 public class RelationshipController {
 
     private final RelationshipService relationshipService;
+    private final NewsService newsService;
 
     @PostMapping("/send/{recipientFsUserId}")
     @ResponseStatus(CREATED)
@@ -47,7 +49,8 @@ public class RelationshipController {
     public void deleteRelationship(
             @RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId,
             @PathVariable UUID relationshipId) {
-        relationshipService.deleteRelationship(fsUserId, relationshipId);
+        Relationship relationship = relationshipService.deleteRelationship(fsUserId, relationshipId);
+        newsService.deleteNewsForPublisherAndReceiver(relationship.getSender(), relationship.getRecipient());
     }
 
     @GetMapping("/{friendFsUserId}")
@@ -73,6 +76,11 @@ public class RelationshipController {
     public List<RelationshipResponse> getSentRelationshipRequests(
             @RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId) {
         return relationshipService.getSentRelationshipRequests(fsUserId);
+    }
+
+    @GetMapping("/friends")
+    public List<UUID> getFriends(@RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId) {
+        return relationshipService.getFriends(fsUserId);
     }
 
 }

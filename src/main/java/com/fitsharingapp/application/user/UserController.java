@@ -1,5 +1,6 @@
 package com.fitsharingapp.application.user;
 
+import com.fitsharingapp.application.user.dto.UserResponse;
 import com.fitsharingapp.common.ErrorCode;
 import com.fitsharingapp.common.ServiceException;
 import com.fitsharingapp.domain.news.NewsService;
@@ -9,13 +10,14 @@ import com.fitsharingapp.application.user.dto.UpdateUserRequest;
 import com.fitsharingapp.domain.user.repository.User;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
 
 import static com.fitsharingapp.common.Constants.FS_USER_ID_HEADER;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
 
 @RestController
 @RequestMapping(path = "/users")
@@ -32,11 +34,12 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public User getAuthenticatedUser() {
-        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public UserResponse getAuthenticatedUser() {
+        return userService.getAuthenticatedUser();
     }
 
     @PutMapping()
+    @ResponseStatus(OK)
     public User updateUser(@RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId,
             @RequestBody UpdateUserRequest userUpdateDTO) {
         return userService.updateUser(fsUserId, userUpdateDTO);
@@ -44,6 +47,7 @@ public class UserController {
 
     @DeleteMapping()
     @Transactional
+    @ResponseStatus(NO_CONTENT)
     public void deleteUser(@RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId) {
         newsService.deleteAllNews(fsUserId);
         relationshipService.deleteAllRelationships(fsUserId);

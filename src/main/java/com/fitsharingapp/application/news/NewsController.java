@@ -1,5 +1,7 @@
 package com.fitsharingapp.application.news;
 
+import com.fitsharingapp.application.news.dto.CreateNewsRequest;
+import com.fitsharingapp.application.news.dto.NewsResponse;
 import com.fitsharingapp.domain.news.NewsService;
 import com.fitsharingapp.domain.news.repository.News;
 import lombok.RequiredArgsConstructor;
@@ -27,18 +29,25 @@ public class NewsController {
     }
 
     @GetMapping("/published")
-    public List<News> getAllPublishedNews(@RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId) {
+    public List<NewsResponse> getAllPublishedNews(@RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId) {
         return newsService.getAllPublishedNews(fsUserId);
     }
 
     @GetMapping("/received")
-    public List<News> getAllReceivedNews(@RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId) {
+    public List<NewsResponse> getAllReceivedNews(@RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId) {
         return newsService.getAllReceivedNews(fsUserId);
+    }
+
+    @GetMapping("/received/{friendFsUserId}")
+    public List<NewsResponse> getAllReceivedNewsFromFriend(
+            @RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId,
+            @PathVariable UUID friendFsUserId) {
+        return newsService.getAllReceivedNewsFromFriend(fsUserId, friendFsUserId);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(NO_CONTENT)
-    public void deleteNews(@RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId, @PathVariable String id) {
+    public void deleteNews(@RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId, @PathVariable UUID id) {
         newsService.deleteNews(fsUserId, id);
     }
 

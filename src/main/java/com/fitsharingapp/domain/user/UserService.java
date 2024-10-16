@@ -1,5 +1,6 @@
 package com.fitsharingapp.domain.user;
 
+import com.fitsharingapp.application.user.dto.UserResponse;
 import com.fitsharingapp.common.ErrorCode;
 import com.fitsharingapp.common.ServiceException;
 import com.fitsharingapp.application.user.dto.CreateUserRequest;
@@ -30,6 +31,12 @@ public class UserService {
 
     public Optional<User> getUserById(UUID fsUserId) {
         return userRepository.findById(fsUserId);
+    }
+
+    public String getUserNameById(UUID fsUserId) {
+        return userRepository.findById(fsUserId)
+                .map(User::getUsername)
+                .orElseThrow(() -> new ServiceException(ErrorCode.USER_NOT_FOUND));
     }
 
     public List<User> searchByUsernameOrName(String searchTerm) {
@@ -68,6 +75,11 @@ public class UserService {
     public void validateUser(UUID fsUserId, ErrorCode errorCode) {
         userRepository.findById(fsUserId)
                 .orElseThrow(() -> new ServiceException(errorCode));
+    }
+
+    public UserResponse getAuthenticatedUser() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return userMapper.toResponse(user);
     }
 
 }

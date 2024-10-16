@@ -1,4 +1,4 @@
-package com.fitsharingapp.application.news;
+package com.fitsharingapp.application.news.dto;
 
 import java.util.UUID;
 
