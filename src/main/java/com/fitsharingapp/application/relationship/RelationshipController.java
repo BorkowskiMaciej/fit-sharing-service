@@ -79,7 +79,7 @@ public class RelationshipController {
     }
 
     @GetMapping("/friends")
-    public List<UUID> getFriends(@RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId) {
+    public List<FriendsResponse> getFriends(@RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId) {
         return relationshipService.getFriends(fsUserId);
     }
 

@@ -5,8 +5,10 @@ import com.fitsharingapp.common.ErrorCode;
 import com.fitsharingapp.common.ServiceException;
 import com.fitsharingapp.application.user.dto.CreateUserRequest;
 import com.fitsharingapp.application.user.dto.UpdateUserRequest;
+import com.fitsharingapp.domain.key.PublicKeyService;
 import com.fitsharingapp.domain.user.repository.User;
 import com.fitsharingapp.domain.user.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,6 +26,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final PublicKeyService publicKeyService;
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
@@ -44,6 +47,7 @@ public class UserService {
         return userRepository.searchByUsernameOrName(searchTerm, authenticated.getFsUserId());
     }
 
+    @Transactional
     public User createUser(CreateUserRequest createUserRequest) {
         if (userRepository.existsByUsername(createUserRequest.username())) {
             throw new ServiceException(ErrorCode.NOT_UNIQUE_USERNAME);
@@ -54,7 +58,9 @@ public class UserService {
         CreateUserRequest userDtoWithEncodedPassword = createUserRequest.toBuilder()
                 .password(passwordEncoder.encode(createUserRequest.password()))
                 .build();
-        return userRepository.save(userMapper.toEntity(userDtoWithEncodedPassword));
+        User user = userRepository.save(userMapper.toEntity(userDtoWithEncodedPassword));
+        publicKeyService.savePublicKey(user.getFsUserId(), createUserRequest.publicKey());
+        return user;
     }
 
     public User updateUser(UUID fsUserId, UpdateUserRequest userUpdateDTO) {

@@ -27,7 +27,8 @@ public enum ErrorCode {
     NOT_ACCEPTED_RELATIONSHIP(HttpStatus.BAD_REQUEST, "SERVICE-0017", "Relationship is not accepted"),
     NEWS_IS_NOT_PUBLISHED_BY_USER(HttpStatus.BAD_REQUEST, "SERVICE-0018", "News is not published by the user"),
     NEWS_NOT_FOUND(HttpStatus.NOT_FOUND, "SERVICE-0019", "News not found"),
-    MISSING_AUTHORIZATION_HEADER(HttpStatus.BAD_REQUEST, "SERVICE-0013", "Missing authorization header");
+    MISSING_AUTHORIZATION_HEADER(HttpStatus.BAD_REQUEST, "SERVICE-0020", "Missing authorization header"),
+    PUBLIC_KEY_NOT_FOUND(HttpStatus.NOT_FOUND, "SERVICE-0021", "Public key not found");
 
     private final HttpStatus httpStatus;
     private final String code;

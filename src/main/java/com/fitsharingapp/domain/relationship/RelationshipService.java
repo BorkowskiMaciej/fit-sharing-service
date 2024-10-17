@@ -1,8 +1,11 @@
 package com.fitsharingapp.domain.relationship;
 
+import com.fitsharingapp.application.relationship.FriendsResponse;
 import com.fitsharingapp.application.relationship.RelationshipResponse;
 import com.fitsharingapp.common.ErrorCode;
 import com.fitsharingapp.common.ServiceException;
+import com.fitsharingapp.domain.key.PublicKeyService;
+import com.fitsharingapp.domain.key.repository.PublicKey;
 import com.fitsharingapp.domain.relationship.repository.Relationship;
 import com.fitsharingapp.domain.relationship.repository.RelationshipRepository;
 import com.fitsharingapp.domain.user.UserService;
@@ -15,6 +18,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import static com.fitsharingapp.common.ErrorCode.PUBLIC_KEY_NOT_FOUND;
 import static com.fitsharingapp.domain.relationship.repository.RelationshipStatus.*;
 
 @Service
@@ -25,6 +29,7 @@ public class RelationshipService {
     private final RelationshipRepository relationshipRepository;
     private final RelationshipMapper relationshipMapper;
     private final UserService userService;
+    private final PublicKeyService publicKeyService;
 
     public Relationship createRelationship(UUID senderFsUserId, UUID recipientFsUserId) {
         validateRecipient(recipientFsUserId);
@@ -150,7 +155,7 @@ public class RelationshipService {
         }
     }
 
-    public List<UUID> getFriends(UUID fsUserId) {
+    public List<FriendsResponse> getFriends(UUID fsUserId) {
         return Stream.concat(
                 relationshipRepository.findAllByRecipientAndStatus(fsUserId, ACCEPTED)
                         .stream()
@@ -158,6 +163,12 @@ public class RelationshipService {
                 relationshipRepository.findAllBySenderAndStatus(fsUserId, ACCEPTED)
                         .stream()
                         .map(Relationship::getRecipient))
+                .map(uuid -> FriendsResponse.builder()
+                        .fsUserId(uuid)
+                        .publicKey(publicKeyService.getPublicKey(uuid)
+                                .map(PublicKey::getKey)
+                                .orElseThrow(() -> new ServiceException(PUBLIC_KEY_NOT_FOUND)))
+                        .build())
                 .toList();
     }
 

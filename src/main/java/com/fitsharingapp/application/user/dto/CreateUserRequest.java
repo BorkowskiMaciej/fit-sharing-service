@@ -11,7 +11,8 @@ public record CreateUserRequest(
         String firstName,
         String lastName,
         int age,
-        String description
+        String description,
+        byte[] publicKey
 
 ) {
 

@@ -31,8 +31,8 @@ public class NewsControllerTest {
     @Test
     void should_CreateNews_When_Requested() {
 
-        User publisher = userService.createUser(new CreateUserRequest("username1", "username1@mail", "admin", "firstName", "lastName", 20, "desctiption"));
-        User receiver = userService.createUser(new CreateUserRequest("username2", "username2@mail", "admin", "firstName", "lastName", 20, "desctiption"));
+        User publisher = userService.createUser(new CreateUserRequest("username1", "username1@mail", "admin", "firstName", "lastName", 20, "description", "key".getBytes()));
+        User receiver = userService.createUser(new CreateUserRequest("username2", "username2@mail", "admin", "firstName", "lastName", 20, "description", "key".getBytes()));
         Relationship relationship = relationshipService.createRelationship(publisher.getFsUserId(), receiver.getFsUserId());
         relationshipService.acceptRelationship(receiver.getFsUserId(), relationship.getId());
         CreateNewsRequest
