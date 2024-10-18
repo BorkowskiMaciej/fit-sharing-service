@@ -1,6 +1,6 @@
 package com.fitsharingapp.domain.relationship;
 
-import com.fitsharingapp.application.relationship.RelationshipResponse;
+import com.fitsharingapp.application.relationship.dto.RelationshipResponse;
 import com.fitsharingapp.domain.relationship.repository.Relationship;
 import com.fitsharingapp.domain.user.repository.User;
 import org.mapstruct.Mapper;

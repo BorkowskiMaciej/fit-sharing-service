@@ -1,4 +1,4 @@
-package com.fitsharingapp.application.logging;
+package com.fitsharingapp.configuration;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;

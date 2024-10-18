@@ -3,6 +3,7 @@ package com.fitsharingapp.domain.news;
 import com.fitsharingapp.application.news.dto.CreateNewsRequest;
 import com.fitsharingapp.application.news.dto.CreateReferenceNewsRequest;
 import com.fitsharingapp.application.news.dto.NewsResponse;
+import com.fitsharingapp.common.ServiceException;
 import com.fitsharingapp.domain.news.repository.News;
 import com.fitsharingapp.domain.news.repository.NewsRepository;
 import com.fitsharingapp.domain.news.repository.ReferenceNews;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
 
-import static com.fitsharingapp.common.ErrorCode.RECEIVER_NOT_FOUND;
+import static com.fitsharingapp.common.ErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +31,7 @@ public class NewsService {
 
     public News createNews(UUID fsUserId, CreateNewsRequest newsDTO) {
         userService.validateUser(newsDTO.receiverFsUserId(), RECEIVER_NOT_FOUND);
-//        relationshipService.validateRelationship(fsUserId, newsDTO.receiverFsUserId());
+        relationshipService.validateRelationship(fsUserId, newsDTO.receiverFsUserId());
         return newsRepository.save(newsMapper.toNewsEntity(newsDTO, fsUserId));
     }
 
@@ -52,18 +53,25 @@ public class NewsService {
                 .stream()
                 .map(news -> newsMapper.toResponse(
                         news,
-                        userService.getUserNameById(news.getPublisherFsUserId()),
-                        userService.getUserNameById(news.getReceiverFsUserId()))
+                        userService.getUsernameById(news.getPublisherFsUserId(), PUBLISHER_NOT_FOUND),
+                        userService.getUsernameById(news.getReceiverFsUserId(), RECEIVER_NOT_FOUND))
                     )
                 .toList();
     }
 
     public void deleteNews(UUID fsUserId, UUID id) {
-        referenceNewsRepository.deleteById(id);
+        referenceNewsRepository.findById(id)
+                .ifPresent(referenceNews -> {
+                    if (!referenceNews.getPublisherFsUserId().equals(fsUserId)) {
+                        throw new ServiceException(USER_IS_NOT_PUBLISHER);
+                    }
+                    referenceNewsRepository.deleteById(id);
+                });
         newsRepository.deleteAll(newsRepository.findAllByReferenceNewsId(id));
     }
 
     public void deleteAllNews(UUID fsUserId) {
+        referenceNewsRepository.deleteAllByPublisherFsUserId(fsUserId);
         newsRepository.deleteAllByPublisherFsUserId(fsUserId);
     }
 
@@ -73,12 +81,13 @@ public class NewsService {
     }
 
     public List<NewsResponse> getAllReceivedNewsFromFriend(UUID fsUserId, UUID friendFsUserId) {
+        relationshipService.validateRelationship(fsUserId, friendFsUserId);
         return newsRepository.findAllByPublisherFsUserIdAndReceiverFsUserId(friendFsUserId, fsUserId)
                 .stream()
                 .map(news -> newsMapper.toResponse(
                         news,
-                        userService.getUserNameById(news.getPublisherFsUserId()),
-                        userService.getUserNameById(news.getReceiverFsUserId()))
+                        userService.getUsernameById(news.getPublisherFsUserId(), PUBLISHER_NOT_FOUND),
+                        userService.getUsernameById(news.getReceiverFsUserId(), RECEIVER_NOT_FOUND))
                     )
                 .toList();
     }

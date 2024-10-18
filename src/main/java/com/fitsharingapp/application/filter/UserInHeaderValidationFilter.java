@@ -3,12 +3,14 @@ package com.fitsharingapp.application.filter;
 import com.fitsharingapp.common.ErrorCode;
 import com.fitsharingapp.common.ServiceException;
 import com.fitsharingapp.domain.user.UserService;
+import com.fitsharingapp.domain.user.repository.User;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -55,6 +57,10 @@ public class UserInHeaderValidationFilter extends OncePerRequestFilter {
         try {
             UUID fsUserId = UUID.fromString(fsUserIdHeader);
             userService.validateUser(fsUserId, ErrorCode.USER_NOT_FOUND);
+            User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if (!user.getFsUserId().equals(fsUserId)) {
+                throw new ServiceException(ErrorCode.NOT_AUTHENTICATED_USER_IN_HEADER);
+            }
             RequestContextHolder.currentRequestAttributes().setAttribute(FS_USER_ID_HEADER, fsUserId,
                     RequestAttributes.SCOPE_REQUEST);
         } catch (IllegalArgumentException e) {

@@ -1,12 +1,11 @@
 package com.fitsharingapp.application.user;
 
+import com.fitsharingapp.application.user.dto.UpdateUserRequest;
 import com.fitsharingapp.application.user.dto.UserResponse;
-import com.fitsharingapp.common.ErrorCode;
-import com.fitsharingapp.common.ServiceException;
+import com.fitsharingapp.domain.key.PublicKeyService;
 import com.fitsharingapp.domain.news.NewsService;
 import com.fitsharingapp.domain.relationship.RelationshipService;
 import com.fitsharingapp.domain.user.UserService;
-import com.fitsharingapp.application.user.dto.UpdateUserRequest;
 import com.fitsharingapp.domain.user.repository.User;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.fitsharingapp.common.Constants.FS_USER_ID_HEADER;
+import static com.fitsharingapp.common.ErrorCode.USER_NOT_FOUND;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -27,16 +27,7 @@ public class UserController {
     private final UserService userService;
     private final RelationshipService relationshipService;
     private final NewsService newsService;
-
-    @GetMapping
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
-    }
-
-    @GetMapping("/me")
-    public UserResponse getAuthenticatedUser() {
-        return userService.getAuthenticatedUser();
-    }
+    private final PublicKeyService publicKeyService;
 
     @PutMapping()
     @ResponseStatus(OK)
@@ -45,24 +36,31 @@ public class UserController {
         return userService.updateUser(fsUserId, userUpdateDTO);
     }
 
-    @DeleteMapping()
-    @Transactional
-    @ResponseStatus(NO_CONTENT)
-    public void deleteUser(@RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId) {
-        newsService.deleteAllNews(fsUserId);
-        relationshipService.deleteAllRelationships(fsUserId);
-        userService.deleteUser(fsUserId);
+    @GetMapping("/me")
+    public UserResponse getAuthenticatedUser(@RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId) {
+        return userService.getAuthenticatedUser(fsUserId);
     }
 
     @GetMapping("/{fsUserId}")
     public User getUserById(@PathVariable UUID fsUserId) {
-        return userService.getUserById(fsUserId)
-                .orElseThrow(() -> new ServiceException(ErrorCode.USER_NOT_FOUND));
+        return userService.getUserById(fsUserId, USER_NOT_FOUND);
     }
 
     @GetMapping("/search")
-    public List<User> getUserBySearchTermWithoutAuthenticated(@RequestParam String searchTerm) {
-        return userService.searchByUsernameOrName(searchTerm);
+    public List<User> getUserBySearchTermWithoutAuthenticated(
+            @RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId,
+            @RequestParam String searchTerm) {
+        return userService.getUserBySearchTermWithoutAuthenticated(fsUserId, searchTerm);
+    }
+
+    @DeleteMapping()
+    @ResponseStatus(NO_CONTENT)
+    @Transactional
+    public void deleteUser(@RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId) {
+        newsService.deleteAllNews(fsUserId);
+        relationshipService.deleteAllRelationships(fsUserId);
+        publicKeyService.deleteKeys(fsUserId);
+        userService.deleteUser(fsUserId);
     }
 
 }

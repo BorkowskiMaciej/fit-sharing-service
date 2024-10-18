@@ -1,4 +1,4 @@
-package com.fitsharingapp.application.relationship;
+package com.fitsharingapp.application.relationship.dto;
 
 import lombok.Builder;
 

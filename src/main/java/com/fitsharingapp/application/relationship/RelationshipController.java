@@ -1,5 +1,7 @@
 package com.fitsharingapp.application.relationship;
 
+import com.fitsharingapp.application.relationship.dto.FriendsResponse;
+import com.fitsharingapp.application.relationship.dto.RelationshipResponse;
 import com.fitsharingapp.domain.news.NewsService;
 import com.fitsharingapp.domain.relationship.RelationshipService;
 import com.fitsharingapp.domain.relationship.repository.Relationship;

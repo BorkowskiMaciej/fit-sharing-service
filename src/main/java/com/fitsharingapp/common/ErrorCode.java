@@ -28,7 +28,10 @@ public enum ErrorCode {
     NEWS_IS_NOT_PUBLISHED_BY_USER(HttpStatus.BAD_REQUEST, "SERVICE-0018", "News is not published by the user"),
     NEWS_NOT_FOUND(HttpStatus.NOT_FOUND, "SERVICE-0019", "News not found"),
     MISSING_AUTHORIZATION_HEADER(HttpStatus.BAD_REQUEST, "SERVICE-0020", "Missing authorization header"),
-    PUBLIC_KEY_NOT_FOUND(HttpStatus.NOT_FOUND, "SERVICE-0021", "Public key not found");
+    PUBLIC_KEY_NOT_FOUND(HttpStatus.NOT_FOUND, "SERVICE-0021", "Public key not found"),
+    PUBLISHER_NOT_FOUND(HttpStatus.NOT_FOUND, "SERVICE-0022", "Publisher not found"),
+    NOT_AUTHENTICATED_USER_IN_HEADER(HttpStatus.NOT_FOUND, "SERVICE-0023", "Not authenticated user in the header"),
+    USER_IS_NOT_PUBLISHER(HttpStatus.BAD_REQUEST, "SERVICE-0024", "User is not the publisher of the news");
 
     private final HttpStatus httpStatus;
     private final String code;

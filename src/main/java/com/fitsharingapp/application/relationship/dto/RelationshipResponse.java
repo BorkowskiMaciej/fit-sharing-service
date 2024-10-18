@@ -1,4 +1,4 @@
-package com.fitsharingapp.application.relationship;
+package com.fitsharingapp.application.relationship.dto;
 
 import com.fitsharingapp.domain.relationship.repository.RelationshipStatus;
 import lombok.Builder;

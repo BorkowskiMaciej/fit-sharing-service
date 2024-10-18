@@ -1,23 +1,22 @@
 package com.fitsharingapp.domain.user;
 
+import com.fitsharingapp.application.authentication.dto.RegisterRequest;
+import com.fitsharingapp.application.user.dto.UpdateUserRequest;
 import com.fitsharingapp.application.user.dto.UserResponse;
 import com.fitsharingapp.common.ErrorCode;
 import com.fitsharingapp.common.ServiceException;
-import com.fitsharingapp.application.user.dto.CreateUserRequest;
-import com.fitsharingapp.application.user.dto.UpdateUserRequest;
 import com.fitsharingapp.domain.key.PublicKeyService;
 import com.fitsharingapp.domain.user.repository.User;
 import com.fitsharingapp.domain.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
+
+import static java.time.LocalDateTime.now;
 
 @Service
 @RequiredArgsConstructor
@@ -28,50 +27,51 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final PublicKeyService publicKeyService;
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public User getUserById(UUID fsUserId, ErrorCode errorCode) {
+        return userRepository.findById(fsUserId)
+                .orElseThrow(() -> new ServiceException(errorCode));
     }
 
-    public Optional<User> getUserById(UUID fsUserId) {
-        return userRepository.findById(fsUserId);
+    public UserResponse getAuthenticatedUser(UUID fsUserId) {
+        return userMapper.toResponse(getUserById(fsUserId, ErrorCode.USER_NOT_FOUND));
     }
 
-    public String getUserNameById(UUID fsUserId) {
+    public String getUsernameById(UUID fsUserId, ErrorCode errorCode) {
         return userRepository.findById(fsUserId)
                 .map(User::getUsername)
-                .orElseThrow(() -> new ServiceException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new ServiceException(errorCode));
     }
 
-    public List<User> searchByUsernameOrName(String searchTerm) {
-        User authenticated = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return userRepository.searchByUsernameOrName(searchTerm, authenticated.getFsUserId());
+    public List<User> getUserBySearchTermWithoutAuthenticated(UUID fsUserId, String searchTerm) {
+        return userRepository.getUserBySearchTermWithoutAuthenticated(searchTerm, fsUserId);
     }
 
     @Transactional
-    public User createUser(CreateUserRequest createUserRequest) {
-        if (userRepository.existsByUsername(createUserRequest.username())) {
+    public UUID createUser(RegisterRequest registerRequest) {
+        if (userRepository.existsByUsername(registerRequest.username())) {
             throw new ServiceException(ErrorCode.NOT_UNIQUE_USERNAME);
         }
-        if (userRepository.existsByEmail(createUserRequest.email())) {
+        if (userRepository.existsByEmail(registerRequest.email())) {
             throw new ServiceException(ErrorCode.NOT_UNIQUE_EMAIL);
         }
-        CreateUserRequest userDtoWithEncodedPassword = createUserRequest.toBuilder()
-                .password(passwordEncoder.encode(createUserRequest.password()))
+        RegisterRequest userDtoWithEncodedPassword = registerRequest.toBuilder()
+                .password(passwordEncoder.encode(registerRequest.password()))
                 .build();
         User user = userRepository.save(userMapper.toEntity(userDtoWithEncodedPassword));
-        publicKeyService.savePublicKey(user.getFsUserId(), createUserRequest.publicKey());
-        return user;
+        publicKeyService.savePublicKey(user.getFsUserId(), registerRequest.publicKey());
+        return user.getFsUserId();
     }
 
     public User updateUser(UUID fsUserId, UpdateUserRequest userUpdateDTO) {
-        User user = userRepository.findById(fsUserId)
-                .orElseThrow(() -> new ServiceException(ErrorCode.USER_NOT_FOUND));
-        user.setFirstName(userUpdateDTO.firstName());
-        user.setLastName(userUpdateDTO.lastName());
-        user.setAge(userUpdateDTO.age());
-        user.setDescription(userUpdateDTO.description());
-        user.setUpdatedAt(LocalDateTime.now());
-        return userRepository.save(user);
+        User updatedUser = getUserById(fsUserId, ErrorCode.USER_NOT_FOUND)
+                .toBuilder()
+                .firstName(userUpdateDTO.firstName())
+                .lastName(userUpdateDTO.lastName())
+                .age(userUpdateDTO.age())
+                .description(userUpdateDTO.description())
+                .updatedAt(now())
+                .build();
+        return userRepository.save(updatedUser);
     }
 
     public void deleteUser(UUID fsUserId) {
@@ -81,11 +81,6 @@ public class UserService {
     public void validateUser(UUID fsUserId, ErrorCode errorCode) {
         userRepository.findById(fsUserId)
                 .orElseThrow(() -> new ServiceException(errorCode));
-    }
-
-    public UserResponse getAuthenticatedUser() {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return userMapper.toResponse(user);
     }
 
 }

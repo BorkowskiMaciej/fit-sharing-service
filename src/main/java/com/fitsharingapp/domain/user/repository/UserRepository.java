@@ -17,7 +17,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
             "LOWER(u.firstName) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
             "LOWER(u.lastName) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) AND " +
             "u.fsUserId != :authenticatedUserId")
-    List<User> searchByUsernameOrName(
+    List<User> getUserBySearchTermWithoutAuthenticated(
             @Param("searchTerm") String searchTerm,
             @Param("authenticatedUserId") UUID authenticatedUserId);
 

@@ -31,7 +31,7 @@ public class PublicKeyService {
         return publicKeyRepository.findByFsUserId(fsUserId);
     }
 
-    public void deletePublicKey(UUID fsUserId) {
+    public void deleteKeys(UUID fsUserId) {
         publicKeyRepository.deleteAllByFsUserId(fsUserId);
     }
 

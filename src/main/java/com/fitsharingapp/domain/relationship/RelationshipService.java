@@ -1,7 +1,7 @@
 package com.fitsharingapp.domain.relationship;
 
-import com.fitsharingapp.application.relationship.FriendsResponse;
-import com.fitsharingapp.application.relationship.RelationshipResponse;
+import com.fitsharingapp.application.relationship.dto.FriendsResponse;
+import com.fitsharingapp.application.relationship.dto.RelationshipResponse;
 import com.fitsharingapp.common.ErrorCode;
 import com.fitsharingapp.common.ServiceException;
 import com.fitsharingapp.domain.key.PublicKeyService;
@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import static com.fitsharingapp.common.ErrorCode.PUBLIC_KEY_NOT_FOUND;
+import static com.fitsharingapp.common.ErrorCode.*;
 import static com.fitsharingapp.domain.relationship.repository.RelationshipStatus.*;
 
 @Service
@@ -32,7 +32,7 @@ public class RelationshipService {
     private final PublicKeyService publicKeyService;
 
     public Relationship createRelationship(UUID senderFsUserId, UUID recipientFsUserId) {
-        validateRecipient(recipientFsUserId);
+        userService.validateUser(recipientFsUserId, RECIPIENT_NOT_FOUND);
         validateRelationshipRequest(senderFsUserId, recipientFsUserId);
         Relationship relationship = Relationship.builder()
                 .id(UUID.randomUUID())
@@ -104,30 +104,33 @@ public class RelationshipService {
         return Stream.concat(
                 relationshipRepository.findAllByRecipientAndStatus(fsUserId, ACCEPTED)
                         .stream()
-                        .map(relationship -> relationshipMapper.toRelationshipResponse(relationship, userService.getUserById(relationship.getSender()).orElseThrow())),
+                        .map(relationship -> relationshipMapper.toRelationshipResponse(
+                                relationship,
+                                userService.getUserById(relationship.getSender(), USER_NOT_FOUND))),
                 relationshipRepository.findAllBySenderAndStatus(fsUserId, ACCEPTED)
                         .stream()
-                        .map(relationship -> relationshipMapper.toRelationshipResponse(relationship, userService.getUserById(relationship.getRecipient()).orElseThrow())))
+                        .map(relationship -> relationshipMapper.toRelationshipResponse(
+                                relationship,
+                                userService.getUserById(relationship.getRecipient(), USER_NOT_FOUND))))
                 .toList();
     }
 
     public List<RelationshipResponse> getReceivedRelationshipRequests(UUID fsUserId) {
         return relationshipRepository.findAllByRecipientAndStatus(fsUserId, PENDING)
                 .stream()
-                .map(relationship -> relationshipMapper.toRelationshipResponse(relationship, userService.getUserById(relationship.getSender()).orElseThrow()))
+                .map(relationship -> relationshipMapper.toRelationshipResponse(
+                        relationship,
+                        userService.getUserById(relationship.getSender(), USER_NOT_FOUND)))
                 .toList();
     }
 
     public List<RelationshipResponse> getSentRelationshipRequests(UUID fsUserId) {
         return relationshipRepository.findAllBySenderAndStatus(fsUserId, PENDING)
                 .stream()
-                .map(relationship -> relationshipMapper.toRelationshipResponse(relationship, userService.getUserById(relationship.getRecipient()).orElseThrow()))
+                .map(relationship -> relationshipMapper.toRelationshipResponse(
+                        relationship,
+                        userService.getUserById(relationship.getRecipient(), USER_NOT_FOUND)))
                 .toList();
-    }
-
-    private void validateRecipient(UUID fsUserId) {
-        userService.getUserById(fsUserId)
-                .orElseThrow(() -> new ServiceException(ErrorCode.RECIPIENT_NOT_FOUND));
     }
 
     private void validateRelationshipRequest(UUID sender, UUID recipient) {
@@ -147,10 +150,8 @@ public class RelationshipService {
     }
 
     public void validateRelationship(UUID publisherFsUserId, UUID receiverFsUserId) {
-        if (!relationshipRepository.existsBySenderAndRecipient(publisherFsUserId, receiverFsUserId)) {
-            throw new ServiceException(ErrorCode.RELATIONSHIP_NOT_FOUND);
-        }
-        if (!relationshipRepository.existsBySenderAndRecipient(receiverFsUserId, publisherFsUserId)) {
+        if (!relationshipRepository.existsBySenderAndRecipient(publisherFsUserId, receiverFsUserId) &&
+                !relationshipRepository.existsBySenderAndRecipient(receiverFsUserId, publisherFsUserId)) {
             throw new ServiceException(ErrorCode.RELATIONSHIP_NOT_FOUND);
         }
     }

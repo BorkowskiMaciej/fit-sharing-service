@@ -12,4 +12,6 @@ public interface ReferenceNewsRepository extends MongoRepository<ReferenceNews, 
 
     List<ReferenceNews> findAllByPublisherFsUserId(UUID fsUserId, Sort sort);
 
+    void deleteAllByPublisherFsUserId(UUID fsUserId);
+
 }

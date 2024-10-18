@@ -25,19 +25,21 @@ public class NewsController {
 
     @PostMapping
     @ResponseStatus(CREATED)
-    public News createNews(@RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId, @RequestBody
-    CreateNewsRequest newsDTO) {
+    public News createNews(
+            @RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId,
+            @RequestBody CreateNewsRequest newsDTO) {
         return newsService.createNews(fsUserId, newsDTO);
     }
 
     @PostMapping("/reference")
     @ResponseStatus(CREATED)
-    public ReferenceNews createReferenceNews(@RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId, @RequestBody
-    CreateReferenceNewsRequest newsDTO) {
+    public ReferenceNews createReferenceNews(
+            @RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId,
+            @RequestBody CreateReferenceNewsRequest newsDTO) {
         return newsService.createReferenceNews(fsUserId, newsDTO);
     }
 
-    @GetMapping("/published")
+    @GetMapping("/reference")
     public List<NewsResponse> getAllPublishedNews(@RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId) {
         return newsService.getAllPublishedNews(fsUserId);
     }
@@ -56,7 +58,9 @@ public class NewsController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(NO_CONTENT)
-    public void deleteNews(@RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId, @PathVariable UUID id) {
+    public void deleteNews(
+            @RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId,
+            @PathVariable UUID id) {
         newsService.deleteNews(fsUserId, id);
     }
 

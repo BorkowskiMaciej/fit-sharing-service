@@ -1,4 +1,4 @@
-package com.fitsharingapp.application.authentication;
+package com.fitsharingapp.security;
 
 import com.fitsharingapp.application.authentication.dto.LoginRequest;
 import com.fitsharingapp.domain.user.repository.User;
