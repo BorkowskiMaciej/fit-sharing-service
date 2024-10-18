@@ -4,6 +4,7 @@ import java.util.UUID;
 
 public record CreateNewsRequest(
 
+        UUID referenceNewsId,
         UUID receiverFsUserId,
         String data
 ) {

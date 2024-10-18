@@ -1,9 +1,11 @@
 package com.fitsharingapp.application.news;
 
 import com.fitsharingapp.application.news.dto.CreateNewsRequest;
+import com.fitsharingapp.application.news.dto.CreateReferenceNewsRequest;
 import com.fitsharingapp.application.news.dto.NewsResponse;
 import com.fitsharingapp.domain.news.NewsService;
 import com.fitsharingapp.domain.news.repository.News;
+import com.fitsharingapp.domain.news.repository.ReferenceNews;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +28,13 @@ public class NewsController {
     public News createNews(@RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId, @RequestBody
     CreateNewsRequest newsDTO) {
         return newsService.createNews(fsUserId, newsDTO);
+    }
+
+    @PostMapping("/reference")
+    @ResponseStatus(CREATED)
+    public ReferenceNews createReferenceNews(@RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId, @RequestBody
+    CreateReferenceNewsRequest newsDTO) {
+        return newsService.createReferenceNews(fsUserId, newsDTO);
     }
 
     @GetMapping("/published")

@@ -37,6 +37,14 @@ public class PublicKeyController {
                 .orElseThrow(() -> new ServiceException(PUBLIC_KEY_NOT_FOUND));
     }
 
+    @GetMapping
+    public PublicKeyResponse getMyPublicKey(@RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId) {
+        return publicKeyService.getPublicKey(fsUserId)
+                .map(PublicKey::getKey)
+                .map(PublicKeyResponse::new)
+                .orElseThrow(() -> new ServiceException(PUBLIC_KEY_NOT_FOUND));
+    }
+
     @DeleteMapping
     public void deleteAllForUser(@RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId) {
         publicKeyService.deletePublicKey(fsUserId);

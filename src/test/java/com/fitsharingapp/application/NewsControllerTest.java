@@ -13,6 +13,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import java.util.UUID;
+
 import static com.fitsharingapp.common.Constants.FS_USER_ID_HEADER;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -36,7 +38,7 @@ public class NewsControllerTest {
         Relationship relationship = relationshipService.createRelationship(publisher.getFsUserId(), receiver.getFsUserId());
         relationshipService.acceptRelationship(receiver.getFsUserId(), relationship.getId());
         CreateNewsRequest
-                createNewsRequest = new CreateNewsRequest(receiver.getFsUserId(), "data");
+                createNewsRequest = new CreateNewsRequest(receiver.getFsUserId(), UUID.randomUUID(), "data");
 
         webTestClient.post()
                 .uri("/news")

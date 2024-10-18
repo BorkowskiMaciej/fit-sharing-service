@@ -10,8 +10,6 @@ import java.util.UUID;
 @Repository
 public interface NewsRepository extends MongoRepository<News, UUID> {
 
-    List<News> findAllByPublisherFsUserId(UUID fsUserId, Sort sort);
-
     List<News> findAllByReceiverFsUserId(UUID fsUserId, Sort sort);
 
     void deleteAllByPublisherFsUserId(UUID fsUserId);
@@ -20,4 +18,5 @@ public interface NewsRepository extends MongoRepository<News, UUID> {
 
     List<News> findAllByPublisherFsUserIdAndReceiverFsUserId(UUID friendFsUserId, UUID fsUserId);
 
+    List<News> findAllByReferenceNewsId(UUID referenceNewsId);
 }
