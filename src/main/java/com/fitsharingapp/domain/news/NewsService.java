@@ -43,7 +43,10 @@ public class NewsService {
         Sort sort = Sort.by(Sort.Order.desc("createdAt"));
         return referenceNewsRepository.findAllByPublisherFsUserId(fsUserId, sort)
                 .stream()
-                .map(newsMapper::toResponse)
+                .map(referenceNews -> newsMapper.toResponse(
+                        referenceNews,
+                        userService.getUserById(referenceNews.getPublisherFsUserId(), PUBLISHER_NOT_FOUND))
+                    )
                 .toList();
     }
 
@@ -53,7 +56,7 @@ public class NewsService {
                 .stream()
                 .map(news -> newsMapper.toResponse(
                         news,
-                        userService.getUsernameById(news.getPublisherFsUserId(), PUBLISHER_NOT_FOUND),
+                        userService.getUserById(news.getPublisherFsUserId(), PUBLISHER_NOT_FOUND),
                         userService.getUsernameById(news.getReceiverFsUserId(), RECEIVER_NOT_FOUND))
                     )
                 .toList();
@@ -86,7 +89,7 @@ public class NewsService {
                 .stream()
                 .map(news -> newsMapper.toResponse(
                         news,
-                        userService.getUsernameById(news.getPublisherFsUserId(), PUBLISHER_NOT_FOUND),
+                        userService.getUserById(news.getPublisherFsUserId(), PUBLISHER_NOT_FOUND),
                         userService.getUsernameById(news.getReceiverFsUserId(), RECEIVER_NOT_FOUND))
                     )
                 .toList();

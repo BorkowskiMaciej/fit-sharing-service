@@ -8,6 +8,7 @@ public record NewsResponse(
         UUID id,
         UUID publisherFsUserId,
         String publisherUsername,
+        String publisherProfilePicture,
         UUID receiverFsUserId,
         String receiverUsername,
         String data,
