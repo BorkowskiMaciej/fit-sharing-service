@@ -1,6 +1,9 @@
 package com.fitsharingapp.application.authentication.dto;
 
+import com.fitsharingapp.domain.user.repository.UserGender;
 import lombok.Builder;
+
+import java.time.LocalDate;
 
 @Builder(toBuilder = true)
 public record RegisterRequest(
@@ -10,7 +13,8 @@ public record RegisterRequest(
         String password,
         String firstName,
         String lastName,
-        int age,
+        LocalDate dateOfBirth,
+        UserGender gender,
         String description,
         byte[] publicKey
 

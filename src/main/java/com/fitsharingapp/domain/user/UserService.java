@@ -7,6 +7,7 @@ import com.fitsharingapp.common.ErrorCode;
 import com.fitsharingapp.common.ServiceException;
 import com.fitsharingapp.domain.key.PublicKeyService;
 import com.fitsharingapp.domain.user.repository.User;
+import com.fitsharingapp.domain.user.repository.UserGender;
 import com.fitsharingapp.domain.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -67,7 +68,7 @@ public class UserService {
                 .toBuilder()
                 .firstName(userUpdateDTO.firstName())
                 .lastName(userUpdateDTO.lastName())
-                .age(userUpdateDTO.age())
+                .gender(UserGender.valueOf(userUpdateDTO.gender().toUpperCase()))
                 .description(userUpdateDTO.description())
                 .updatedAt(now())
                 .build();
