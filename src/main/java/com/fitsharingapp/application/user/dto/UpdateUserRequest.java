@@ -4,7 +4,8 @@ public record UpdateUserRequest(
         String firstName,
         String lastName,
         String description,
-        String gender
+        String gender,
+        String profilePicture
 
 ) {
 }

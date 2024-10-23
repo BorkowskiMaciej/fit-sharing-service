@@ -13,7 +13,8 @@ public record RelationshipResponse(
         String friendUsername,
         String friendFirstName,
         String friendLastName,
-        RelationshipStatus status
+        RelationshipStatus status,
+        String profilePicture
 
 ) {
 

@@ -16,7 +16,8 @@ public record RegisterRequest(
         LocalDate dateOfBirth,
         UserGender gender,
         String description,
-        byte[] publicKey
+        byte[] publicKey,
+        String profilePicture
 
 ) {
 

@@ -6,7 +6,6 @@ import com.fitsharingapp.domain.key.PublicKeyService;
 import com.fitsharingapp.domain.news.NewsService;
 import com.fitsharingapp.domain.relationship.RelationshipService;
 import com.fitsharingapp.domain.user.UserService;
-import com.fitsharingapp.domain.user.repository.User;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +30,7 @@ public class UserController {
 
     @PutMapping()
     @ResponseStatus(OK)
-    public User updateUser(@RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId,
+    public UserResponse updateUser(@RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId,
             @RequestBody UpdateUserRequest userUpdateDTO) {
         return userService.updateUser(fsUserId, userUpdateDTO);
     }
@@ -42,12 +41,12 @@ public class UserController {
     }
 
     @GetMapping("/{fsUserId}")
-    public User getUserById(@PathVariable UUID fsUserId) {
-        return userService.getUserById(fsUserId, USER_NOT_FOUND);
+    public UserResponse getUserById(@PathVariable UUID fsUserId) {
+        return userService.getUserResponseById(fsUserId, USER_NOT_FOUND);
     }
 
     @GetMapping("/search")
-    public List<User> getUserBySearchTermWithoutAuthenticated(
+    public List<UserResponse> getUserBySearchTermWithoutAuthenticated(
             @RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId,
             @RequestParam String searchTerm) {
         return userService.getUserBySearchTermWithoutAuthenticated(fsUserId, searchTerm);

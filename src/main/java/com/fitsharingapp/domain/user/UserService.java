@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,6 +34,10 @@ public class UserService {
                 .orElseThrow(() -> new ServiceException(errorCode));
     }
 
+    public UserResponse getUserResponseById(UUID fsUserId, ErrorCode errorCode) {
+        return userMapper.toResponse(getUserById(fsUserId, errorCode));
+    }
+
     public UserResponse getAuthenticatedUser(UUID fsUserId) {
         return userMapper.toResponse(getUserById(fsUserId, ErrorCode.USER_NOT_FOUND));
     }
@@ -43,8 +48,11 @@ public class UserService {
                 .orElseThrow(() -> new ServiceException(errorCode));
     }
 
-    public List<User> getUserBySearchTermWithoutAuthenticated(UUID fsUserId, String searchTerm) {
-        return userRepository.getUserBySearchTermWithoutAuthenticated(searchTerm, fsUserId);
+    public List<UserResponse> getUserBySearchTermWithoutAuthenticated(UUID fsUserId, String searchTerm) {
+        return userRepository.getUserBySearchTermWithoutAuthenticated(searchTerm, fsUserId)
+                .stream()
+                .map(userMapper::toResponse)
+                .toList();
     }
 
     @Transactional
@@ -63,16 +71,20 @@ public class UserService {
         return user.getFsUserId();
     }
 
-    public User updateUser(UUID fsUserId, UpdateUserRequest userUpdateDTO) {
+    public UserResponse updateUser(UUID fsUserId, UpdateUserRequest userUpdateDTO) {
+        byte[] profilePicture = userUpdateDTO.profilePicture() != null
+                ? Base64.getDecoder().decode(userUpdateDTO.profilePicture().split(",")[1])
+                : null;
         User updatedUser = getUserById(fsUserId, ErrorCode.USER_NOT_FOUND)
                 .toBuilder()
                 .firstName(userUpdateDTO.firstName())
                 .lastName(userUpdateDTO.lastName())
                 .gender(UserGender.valueOf(userUpdateDTO.gender().toUpperCase()))
                 .description(userUpdateDTO.description())
+                .profilePicture(profilePicture)
                 .updatedAt(now())
                 .build();
-        return userRepository.save(updatedUser);
+        return userMapper.toResponse(userRepository.save(updatedUser));
     }
 
     public void deleteUser(UUID fsUserId) {
