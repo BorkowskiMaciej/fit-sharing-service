@@ -1,5 +1,6 @@
 package com.fitsharingapp.application.user;
 
+import com.fitsharingapp.application.user.dto.UpdatePasswordRequest;
 import com.fitsharingapp.application.user.dto.UpdateUserRequest;
 import com.fitsharingapp.application.user.dto.UserResponse;
 import com.fitsharingapp.domain.key.PublicKeyService;
@@ -33,6 +34,14 @@ public class UserController {
     public UserResponse updateUser(@RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId,
             @RequestBody UpdateUserRequest userUpdateDTO) {
         return userService.updateUser(fsUserId, userUpdateDTO);
+    }
+
+    @PatchMapping("/password")
+    @ResponseStatus(OK)
+    public void changePassword(
+            @RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId,
+            @RequestBody UpdatePasswordRequest updatePasswordRequest) {
+        userService.updatePassword(fsUserId, updatePasswordRequest);
     }
 
     @GetMapping("/me")

@@ -1,6 +1,7 @@
 package com.fitsharingapp.domain.user;
 
 import com.fitsharingapp.application.authentication.dto.RegisterRequest;
+import com.fitsharingapp.application.user.dto.UpdatePasswordRequest;
 import com.fitsharingapp.application.user.dto.UpdateUserRequest;
 import com.fitsharingapp.application.user.dto.UserResponse;
 import com.fitsharingapp.common.ErrorCode;
@@ -18,6 +19,10 @@ import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
+import static com.fitsharingapp.common.ErrorCode.INVALID_OLD_PASSWORD;
+import static com.fitsharingapp.common.ErrorCode.NOT_UNIQUE_USERNAME;
+import static com.fitsharingapp.common.ErrorCode.NOT_UNIQUE_EMAIL;
+import static com.fitsharingapp.common.ErrorCode.USER_NOT_FOUND;
 import static java.time.LocalDateTime.now;
 
 @Service
@@ -39,7 +44,7 @@ public class UserService {
     }
 
     public UserResponse getAuthenticatedUser(UUID fsUserId) {
-        return userMapper.toResponse(getUserById(fsUserId, ErrorCode.USER_NOT_FOUND));
+        return userMapper.toResponse(getUserById(fsUserId, USER_NOT_FOUND));
     }
 
     public String getUsernameById(UUID fsUserId, ErrorCode errorCode) {
@@ -58,10 +63,10 @@ public class UserService {
     @Transactional
     public UUID createUser(RegisterRequest registerRequest) {
         if (userRepository.existsByUsername(registerRequest.username())) {
-            throw new ServiceException(ErrorCode.NOT_UNIQUE_USERNAME);
+            throw new ServiceException(NOT_UNIQUE_USERNAME);
         }
         if (userRepository.existsByEmail(registerRequest.email())) {
-            throw new ServiceException(ErrorCode.NOT_UNIQUE_EMAIL);
+            throw new ServiceException(NOT_UNIQUE_EMAIL);
         }
         RegisterRequest userDtoWithEncodedPassword = registerRequest.toBuilder()
                 .password(passwordEncoder.encode(registerRequest.password()))
@@ -75,7 +80,7 @@ public class UserService {
         byte[] profilePicture = userUpdateDTO.profilePicture() != null
                 ? Base64.getDecoder().decode(userUpdateDTO.profilePicture().split(",")[1])
                 : null;
-        User updatedUser = getUserById(fsUserId, ErrorCode.USER_NOT_FOUND)
+        User updatedUser = getUserById(fsUserId, USER_NOT_FOUND)
                 .toBuilder()
                 .firstName(userUpdateDTO.firstName())
                 .lastName(userUpdateDTO.lastName())
@@ -85,6 +90,18 @@ public class UserService {
                 .updatedAt(now())
                 .build();
         return userMapper.toResponse(userRepository.save(updatedUser));
+    }
+
+    public void updatePassword(UUID fsUserId, UpdatePasswordRequest request) {
+        User user = userRepository.findById(fsUserId)
+                .orElseThrow(() -> new ServiceException(USER_NOT_FOUND));
+
+        if (!passwordEncoder.matches(request.currentPassword(), user.getPassword())) {
+            throw new ServiceException(INVALID_OLD_PASSWORD);
+        }
+
+        user.setPassword(passwordEncoder.encode(request.newPassword()));
+        userRepository.save(user);
     }
 
     public void deleteUser(UUID fsUserId) {

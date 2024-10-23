@@ -34,7 +34,9 @@ public enum ErrorCode {
     USER_IS_NOT_PUBLISHER(HttpStatus.BAD_REQUEST, "SERVICE-0024", "User is not the publisher of the news"),
     INVALID_TOKEN_DIFFERENT_USER(HttpStatus.BAD_REQUEST, "SERVICE-0025", "Invalid token, different user"),
     INVALID_TOKEN_EXPIRED(HttpStatus.BAD_REQUEST, "SERVICE-0026", "Invalid token, expired"),
-    INVALID_RESET_PASSWORD_CODE(HttpStatus.BAD_REQUEST, "SERVICE-0027", "Invalid reset password code.");
+    INVALID_RESET_PASSWORD_CODE(HttpStatus.BAD_REQUEST, "SERVICE-0027", "Invalid reset password code."),
+    INVALID_RESET_PASSWORD_CODE_EXPIRED(HttpStatus.BAD_REQUEST, "SERVICE-0028", "Invalid reset password code, expired."),
+    INVALID_OLD_PASSWORD(HttpStatus.BAD_REQUEST, "SERVICE-0029", "Invalid old password.");
 
     private final HttpStatus httpStatus;
     private final String code;
