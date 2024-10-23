@@ -38,6 +38,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     static {
         excludedPaths.add("/auth/login");
         excludedPaths.add("/auth/register");
+        excludedPaths.add("/auth/reset-password-request");
+        excludedPaths.add("/auth/reset-password");
     }
 
     @Override

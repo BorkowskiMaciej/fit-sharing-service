@@ -1,9 +1,6 @@
 package com.fitsharingapp.application.authentication;
 
-import com.fitsharingapp.application.authentication.dto.LoginRequest;
-import com.fitsharingapp.application.authentication.dto.LoginResponse;
-import com.fitsharingapp.application.authentication.dto.RegisterRequest;
-import com.fitsharingapp.application.authentication.dto.RegisterResponse;
+import com.fitsharingapp.application.authentication.dto.*;
 import com.fitsharingapp.domain.user.UserService;
 import com.fitsharingapp.domain.user.repository.User;
 import com.fitsharingapp.security.AuthenticationService;
@@ -37,6 +34,18 @@ public class AuthenticationController {
                 user.getFsUserId(),
                 jwtService.generateToken(user),
                 jwtService.getJwtExpiration());
+    }
+
+    @PostMapping("/reset-password-request")
+    @ResponseStatus(OK)
+    public void resetPasswordRequest(@RequestBody ResetPasswordRequest request) {
+        authenticationService.resetPasswordRequest(request.email());
+    }
+
+    @PostMapping("/reset-password")
+    @ResponseStatus(OK)
+    public void resetPassword(@RequestBody ResetPasswordRequest request) {
+        authenticationService.resetPassword(request);
     }
 
 }
