@@ -1,8 +1,8 @@
 package com.fitsharingapp.application.filter;
 
-import com.fitsharingapp.common.ErrorCode;
 import com.fitsharingapp.common.ServiceException;
 import com.fitsharingapp.security.JwtService;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,7 +17,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -25,12 +24,13 @@ import java.util.Set;
 
 import static com.fitsharingapp.common.Constants.AUTHORIZATION_HEADER;
 import static com.fitsharingapp.common.Constants.AUTHORIZATION_HEADER_PREFIX;
+import static com.fitsharingapp.common.ErrorCode.INVALID_TOKEN_EXPIRED;
+import static com.fitsharingapp.common.ErrorCode.MISSING_AUTHORIZATION_HEADER;
 
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final HandlerExceptionResolver handlerExceptionResolver;
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
     private static final Set<String> excludedPaths = new HashSet<>();
@@ -53,7 +53,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String authorizationHeader = request.getHeader(AUTHORIZATION_HEADER);
         if (authorizationHeader == null || !authorizationHeader.startsWith(AUTHORIZATION_HEADER_PREFIX)) {
-            throw new ServiceException(ErrorCode.MISSING_AUTHORIZATION_HEADER);
+            throw new ServiceException(MISSING_AUTHORIZATION_HEADER);
         }
 
         try {
@@ -75,8 +75,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
 
             filterChain.doFilter(request, response);
-        } catch (Exception exception) {
-            handlerExceptionResolver.resolveException(request, response, null, exception);
+        } catch (ExpiredJwtException exception) {
+            throw new ServiceException(INVALID_TOKEN_EXPIRED);
         }
     }
 

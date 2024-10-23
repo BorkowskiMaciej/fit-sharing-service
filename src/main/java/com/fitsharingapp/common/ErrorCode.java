@@ -31,7 +31,9 @@ public enum ErrorCode {
     PUBLIC_KEY_NOT_FOUND(HttpStatus.NOT_FOUND, "SERVICE-0021", "Public key not found"),
     PUBLISHER_NOT_FOUND(HttpStatus.NOT_FOUND, "SERVICE-0022", "Publisher not found"),
     NOT_AUTHENTICATED_USER_IN_HEADER(HttpStatus.NOT_FOUND, "SERVICE-0023", "Not authenticated user in the header"),
-    USER_IS_NOT_PUBLISHER(HttpStatus.BAD_REQUEST, "SERVICE-0024", "User is not the publisher of the news");
+    USER_IS_NOT_PUBLISHER(HttpStatus.BAD_REQUEST, "SERVICE-0024", "User is not the publisher of the news"),
+    INVALID_TOKEN_DIFFERENT_USER(HttpStatus.BAD_REQUEST, "SERVICE-0025", "Invalid token, different user"),
+    INVALID_TOKEN_EXPIRED(HttpStatus.BAD_REQUEST, "SERVICE-0026", "Invalid token, expired");
 
     private final HttpStatus httpStatus;
     private final String code;
