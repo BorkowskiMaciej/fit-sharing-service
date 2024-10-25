@@ -1,4 +1,4 @@
-package com.fitsharingapp.domain.user;
+package com.fitsharingapp.application.user;
 
 import com.fitsharingapp.application.common.validator.RequestValidator;
 import com.fitsharingapp.application.user.dto.UpdatePasswordRequest;
@@ -6,6 +6,7 @@ import com.fitsharingapp.application.user.dto.UpdateUserRequest;
 import com.fitsharingapp.application.user.dto.UserResponse;
 import com.fitsharingapp.common.ErrorCode;
 import com.fitsharingapp.common.ServiceException;
+import com.fitsharingapp.domain.user.UserMapper;
 import com.fitsharingapp.domain.user.repository.User;
 import com.fitsharingapp.domain.user.repository.UserGender;
 import com.fitsharingapp.domain.user.repository.UserRepository;
@@ -30,33 +31,8 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final RequestValidator requestValidator;
 
-    public User getUserById(UUID fsUserId, ErrorCode errorCode) {
-        return userRepository.findById(fsUserId)
-                .orElseThrow(() -> new ServiceException(errorCode));
-    }
-
-    public UserResponse getUserResponseById(UUID fsUserId, ErrorCode errorCode) {
-        return userMapper.toResponse(getUserById(fsUserId, errorCode));
-    }
-
-    public UserResponse getAuthenticatedUser(UUID fsUserId) {
-        return userMapper.toResponse(getUserById(fsUserId, USER_NOT_FOUND));
-    }
-
-    public String getUsernameById(UUID fsUserId, ErrorCode errorCode) {
-        return userRepository.findById(fsUserId)
-                .map(User::getUsername)
-                .orElseThrow(() -> new ServiceException(errorCode));
-    }
-
-    public List<UserResponse> getUserBySearchTermWithoutAuthenticated(UUID fsUserId, String searchTerm) {
-        return userRepository.getUserBySearchTermWithoutAuthenticated(searchTerm, fsUserId)
-                .stream()
-                .map(userMapper::toResponse)
-                .toList();
-    }
-
     public UserResponse updateUser(UUID fsUserId, UpdateUserRequest userUpdateDTO) {
+        requestValidator.validate(userUpdateDTO);
         byte[] profilePicture = userUpdateDTO.profilePicture() != null
                 ? Base64.getDecoder().decode(userUpdateDTO.profilePicture().split(",")[1])
                 : null;
@@ -73,8 +49,8 @@ public class UserService {
     }
 
     public void updatePassword(UUID fsUserId, UpdatePasswordRequest request) {
-        User user = userRepository.findById(fsUserId)
-                .orElseThrow(() -> new ServiceException(USER_NOT_FOUND));
+        requestValidator.validate(request);
+        User user = getUserById(fsUserId, USER_NOT_FOUND);
 
         if (!passwordEncoder.matches(request.currentPassword(), user.getPassword())) {
             throw new ServiceException(INVALID_OLD_PASSWORD);
@@ -84,8 +60,30 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public UserResponse getUserResponseById(UUID fsUserId) {
+        return userMapper.toResponse(getUserById(fsUserId, USER_NOT_FOUND));
+    }
+
+    public List<UserResponse> getUserBySearchTermWithoutAuthenticated(UUID fsUserId, String searchTerm) {
+        return userRepository.getUserBySearchTermWithoutAuthenticated(searchTerm, fsUserId)
+                .stream()
+                .map(userMapper::toResponse)
+                .toList();
+    }
+
     public void deleteUser(UUID fsUserId) {
         userRepository.deleteById(fsUserId);
+    }
+
+    public User getUserById(UUID fsUserId, ErrorCode errorCode) {
+        return userRepository.findById(fsUserId)
+                .orElseThrow(() -> new ServiceException(errorCode));
+    }
+
+    public String getUsernameById(UUID fsUserId, ErrorCode errorCode) {
+        return userRepository.findById(fsUserId)
+                .map(User::getUsername)
+                .orElseThrow(() -> new ServiceException(errorCode));
     }
 
     public void validateUser(UUID fsUserId, ErrorCode errorCode) {

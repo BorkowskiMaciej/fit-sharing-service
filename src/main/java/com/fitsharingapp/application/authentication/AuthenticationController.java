@@ -1,7 +1,6 @@
 package com.fitsharingapp.application.authentication;
 
 import com.fitsharingapp.application.authentication.dto.*;
-import com.fitsharingapp.security.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

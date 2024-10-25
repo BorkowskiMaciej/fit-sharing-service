@@ -2,7 +2,7 @@ package com.fitsharingapp.application.filter;
 
 import com.fitsharingapp.common.ErrorCode;
 import com.fitsharingapp.common.ServiceException;
-import com.fitsharingapp.domain.user.UserService;
+import com.fitsharingapp.application.user.UserService;
 import com.fitsharingapp.domain.user.repository.User;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;

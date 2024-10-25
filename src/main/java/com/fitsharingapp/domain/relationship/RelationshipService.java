@@ -7,7 +7,7 @@ import com.fitsharingapp.common.ServiceException;
 import com.fitsharingapp.domain.key.PublicKeyService;
 import com.fitsharingapp.domain.relationship.repository.Relationship;
 import com.fitsharingapp.domain.relationship.repository.RelationshipRepository;
-import com.fitsharingapp.domain.user.UserService;
+import com.fitsharingapp.application.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,4 @@
-package com.fitsharingapp.security;
+package com.fitsharingapp.application.authentication;
 
 import com.fitsharingapp.application.authentication.dto.*;
 import com.fitsharingapp.application.common.validator.RequestValidator;
@@ -7,6 +7,7 @@ import com.fitsharingapp.domain.key.PublicKeyService;
 import com.fitsharingapp.domain.user.UserMapper;
 import com.fitsharingapp.domain.user.repository.User;
 import com.fitsharingapp.domain.user.repository.UserRepository;
+import com.fitsharingapp.security.JwtService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
