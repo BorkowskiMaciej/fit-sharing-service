@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+import static com.fitsharingapp.common.Constants.FS_DEVICE_ID_HEADER;
 import static com.fitsharingapp.common.Constants.FS_USER_ID_HEADER;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
@@ -35,25 +36,31 @@ public class NewsController {
     @ResponseStatus(CREATED)
     public ReferenceNews createReferenceNews(
             @RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId,
+            @RequestHeader(value = FS_DEVICE_ID_HEADER) UUID deviceId,
             @RequestBody CreateReferenceNewsRequest newsDTO) {
-        return newsService.createReferenceNews(fsUserId, newsDTO);
+        return newsService.createReferenceNews(fsUserId, deviceId, newsDTO);
     }
 
     @GetMapping("/reference")
-    public List<NewsResponse> getAllPublishedNews(@RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId) {
-        return newsService.getAllPublishedNews(fsUserId);
+    public List<NewsResponse> getAllPublishedNews(
+            @RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId,
+            @RequestHeader(value = FS_DEVICE_ID_HEADER) UUID deviceId) {
+        return newsService.getAllPublishedNews(fsUserId, deviceId);
     }
 
     @GetMapping("/received")
-    public List<NewsResponse> getAllReceivedNews(@RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId) {
-        return newsService.getAllReceivedNews(fsUserId);
+    public List<NewsResponse> getAllReceivedNews(
+            @RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId,
+            @RequestHeader(value = FS_DEVICE_ID_HEADER) UUID deviceId) {
+        return newsService.getAllReceivedNews(fsUserId, deviceId);
     }
 
     @GetMapping("/received/{friendFsUserId}")
     public List<NewsResponse> getAllReceivedNewsFromFriend(
             @RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId,
+            @RequestHeader(value = FS_DEVICE_ID_HEADER) UUID deviceId,
             @PathVariable UUID friendFsUserId) {
-        return newsService.getAllReceivedNewsFromFriend(fsUserId, friendFsUserId);
+        return newsService.getAllReceivedNewsFromFriend(fsUserId, deviceId, friendFsUserId);
     }
 
     @DeleteMapping("/{id}")

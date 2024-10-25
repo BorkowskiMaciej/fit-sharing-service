@@ -5,7 +5,6 @@ import com.fitsharingapp.application.relationship.dto.RelationshipResponse;
 import com.fitsharingapp.common.ErrorCode;
 import com.fitsharingapp.common.ServiceException;
 import com.fitsharingapp.domain.key.PublicKeyService;
-import com.fitsharingapp.domain.key.repository.PublicKey;
 import com.fitsharingapp.domain.relationship.repository.Relationship;
 import com.fitsharingapp.domain.relationship.repository.RelationshipRepository;
 import com.fitsharingapp.domain.user.UserService;
@@ -164,12 +163,13 @@ public class RelationshipService {
                 relationshipRepository.findAllBySenderAndStatus(fsUserId, ACCEPTED)
                         .stream()
                         .map(Relationship::getRecipient))
-                .map(uuid -> FriendsResponse.builder()
-                        .fsUserId(uuid)
-                        .publicKey(publicKeyService.getPublicKey(uuid)
-                                .map(PublicKey::getKey)
-                                .orElseThrow(() -> new ServiceException(PUBLIC_KEY_NOT_FOUND)))
-                        .build())
+                .flatMap(uuid -> publicKeyService.getPublicKeys(uuid)
+                        .stream()
+                        .map(publicKey -> FriendsResponse.builder()
+                                .fsUserId(uuid)
+                                .publicKey(publicKey.getKey())
+                                .deviceId(publicKey.getDeviceId())
+                                .build()))
                 .toList();
     }
 

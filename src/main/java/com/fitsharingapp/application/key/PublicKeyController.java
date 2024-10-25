@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+import static com.fitsharingapp.common.Constants.FS_DEVICE_ID_HEADER;
 import static com.fitsharingapp.common.Constants.FS_USER_ID_HEADER;
 import static com.fitsharingapp.common.ErrorCode.PUBLIC_KEY_NOT_FOUND;
 import static org.springframework.http.HttpStatus.CREATED;
@@ -26,22 +27,14 @@ public class PublicKeyController {
     public void createPublicKey(
             @RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId,
             @RequestBody CreatePublicKeyRequest createPublicKeyRequest) {
-        publicKeyService.savePublicKey(fsUserId, createPublicKeyRequest.publicKey());
-    }
-
-    @GetMapping("/{friendFsUserId}")
-    public PublicKeyResponse getPublicKey(
-            @RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId,
-            @PathVariable UUID friendFsUserId) {
-        return publicKeyService.getPublicKey(friendFsUserId)
-                .map(PublicKey::getKey)
-                .map(PublicKeyResponse::new)
-                .orElseThrow(() -> new ServiceException(PUBLIC_KEY_NOT_FOUND));
+        publicKeyService.savePublicKey(fsUserId, createPublicKeyRequest);
     }
 
     @GetMapping
-    public PublicKeyResponse getMyPublicKey(@RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId) {
-        return publicKeyService.getPublicKey(fsUserId)
+    public PublicKeyResponse getMyPublicKey(
+            @RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId,
+            @RequestHeader(value = FS_DEVICE_ID_HEADER) UUID deviceId) {
+        return publicKeyService.getPublicKey(fsUserId, deviceId)
                 .map(PublicKey::getKey)
                 .map(PublicKeyResponse::new)
                 .orElseThrow(() -> new ServiceException(PUBLIC_KEY_NOT_FOUND));

@@ -10,13 +10,13 @@ import java.util.UUID;
 @Repository
 public interface NewsRepository extends MongoRepository<News, UUID> {
 
-    List<News> findAllByReceiverFsUserId(UUID fsUserId, Sort sort);
+    List<News> findAllByReceiverFsUserIdAndReceiverDeviceId(UUID fsUserId, UUID deviceId, Sort sort);
 
     void deleteAllByPublisherFsUserId(UUID fsUserId);
 
     void deleteByPublisherFsUserIdAndReceiverFsUserId(UUID sender, UUID recipient);
 
-    List<News> findAllByPublisherFsUserIdAndReceiverFsUserId(UUID friendFsUserId, UUID fsUserId);
+    List<News> findAllByPublisherFsUserIdAndReceiverFsUserIdAndReceiverDeviceId(UUID friendFsUserId, UUID fsUserId, UUID deviceId, Sort sort);
 
     List<News> findAllByReferenceNewsId(UUID referenceNewsId);
 }

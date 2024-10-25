@@ -1,5 +1,12 @@
 package com.fitsharingapp.application.key.dto;
 
-public record CreatePublicKeyRequest(byte[] publicKey) {
+import java.util.UUID;
+
+public record CreatePublicKeyRequest(
+
+        byte[] publicKey,
+        UUID deviceId
+
+) {
 
 }

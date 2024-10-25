@@ -4,10 +4,10 @@ import com.fitsharingapp.domain.user.repository.UserGender;
 import lombok.Builder;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Builder(toBuilder = true)
 public record RegisterRequest(
-
         String username,
         String email,
         String password,
@@ -17,7 +17,8 @@ public record RegisterRequest(
         UserGender gender,
         String description,
         byte[] publicKey,
-        String profilePicture
+        String profilePicture,
+        UUID deviceId
 
 ) {
 

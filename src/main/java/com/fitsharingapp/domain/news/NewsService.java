@@ -35,13 +35,13 @@ public class NewsService {
         return newsRepository.save(newsMapper.toNewsEntity(newsDTO, fsUserId));
     }
 
-    public ReferenceNews createReferenceNews(UUID fsUserId, CreateReferenceNewsRequest newsDTO) {
-        return referenceNewsRepository.save(newsMapper.toReferenceNewsEntity(newsDTO, fsUserId));
+    public ReferenceNews createReferenceNews(UUID fsUserId, UUID deviceId, CreateReferenceNewsRequest newsDTO) {
+        return referenceNewsRepository.save(newsMapper.toReferenceNewsEntity(newsDTO, fsUserId, deviceId));
     }
 
-    public List<NewsResponse> getAllPublishedNews(UUID fsUserId) {
+    public List<NewsResponse> getAllPublishedNews(UUID fsUserId, UUID deviceId) {
         Sort sort = Sort.by(Sort.Order.desc("createdAt"));
-        return referenceNewsRepository.findAllByPublisherFsUserId(fsUserId, sort)
+        return referenceNewsRepository.findAllByPublisherFsUserIdAndDeviceId(fsUserId, deviceId, sort)
                 .stream()
                 .map(referenceNews -> newsMapper.toResponse(
                         referenceNews,
@@ -50,9 +50,9 @@ public class NewsService {
                 .toList();
     }
 
-    public List<NewsResponse> getAllReceivedNews(UUID fsUserId) {
+    public List<NewsResponse> getAllReceivedNews(UUID fsUserId, UUID deviceId) {
         Sort sort = Sort.by(Sort.Order.desc("createdAt"));
-        return newsRepository.findAllByReceiverFsUserId(fsUserId, sort)
+        return newsRepository.findAllByReceiverFsUserIdAndReceiverDeviceId(fsUserId, deviceId, sort)
                 .stream()
                 .map(news -> newsMapper.toResponse(
                         news,
@@ -83,9 +83,10 @@ public class NewsService {
         newsRepository.deleteByPublisherFsUserIdAndReceiverFsUserId(recipient, sender);
     }
 
-    public List<NewsResponse> getAllReceivedNewsFromFriend(UUID fsUserId, UUID friendFsUserId) {
+    public List<NewsResponse> getAllReceivedNewsFromFriend(UUID fsUserId, UUID deviceId, UUID friendFsUserId) {
+        Sort sort = Sort.by(Sort.Order.desc("createdAt"));
         relationshipService.validateRelationship(fsUserId, friendFsUserId);
-        return newsRepository.findAllByPublisherFsUserIdAndReceiverFsUserId(friendFsUserId, fsUserId)
+        return newsRepository.findAllByPublisherFsUserIdAndReceiverFsUserIdAndReceiverDeviceId(friendFsUserId, fsUserId, deviceId, sort)
                 .stream()
                 .map(news -> newsMapper.toResponse(
                         news,

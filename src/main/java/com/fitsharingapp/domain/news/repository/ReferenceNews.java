@@ -14,6 +14,8 @@ public class ReferenceNews {
     @Id
     private UUID id;
     private UUID publisherFsUserId;
+    private UUID deviceId;
+
     private String data;
     private LocalDateTime createdAt;
 

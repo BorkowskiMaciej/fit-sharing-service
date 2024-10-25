@@ -72,7 +72,7 @@ public class UserService {
                 .password(passwordEncoder.encode(registerRequest.password()))
                 .build();
         User user = userRepository.save(userMapper.toEntity(userDtoWithEncodedPassword));
-        publicKeyService.savePublicKey(user.getFsUserId(), registerRequest.publicKey());
+        publicKeyService.savePublicKey(user.getFsUserId(), registerRequest.deviceId(), registerRequest.publicKey());
         return user.getFsUserId();
     }
 

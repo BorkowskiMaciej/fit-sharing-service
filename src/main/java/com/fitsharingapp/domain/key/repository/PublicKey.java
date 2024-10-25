@@ -20,6 +20,9 @@ public class PublicKey {
     @Column(name = "fs_user_id")
     private UUID fsUserId;
 
+    @Column(name = "device_id")
+    private UUID deviceId;
+
     private byte[] key;
 
     @Column(name = "generated_at")

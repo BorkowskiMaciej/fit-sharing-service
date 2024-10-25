@@ -6,6 +6,7 @@ public record CreateNewsRequest(
 
         UUID referenceNewsId,
         UUID receiverFsUserId,
+        UUID receiverDeviceId,
         String data
 ) {
 

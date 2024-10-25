@@ -8,7 +8,8 @@ import java.util.UUID;
 public record FriendsResponse(
 
         UUID fsUserId,
-        byte[] publicKey
+        byte[] publicKey,
+        UUID deviceId
 ) {
 
 }

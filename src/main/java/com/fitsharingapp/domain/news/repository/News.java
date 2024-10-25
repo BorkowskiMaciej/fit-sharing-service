@@ -16,6 +16,7 @@ public class News {
 
     private UUID publisherFsUserId;
     private UUID receiverFsUserId;
+    private UUID receiverDeviceId;
 
     private String data;
     private LocalDateTime createdAt;

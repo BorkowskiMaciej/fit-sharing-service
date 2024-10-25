@@ -24,7 +24,7 @@ public interface NewsMapper {
     @Mapping(target = "id", expression = "java(java.util.UUID.randomUUID())")
     @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())")
     @Mapping(target = "publisherFsUserId", source = "fsUserId")
-    ReferenceNews toReferenceNewsEntity(CreateReferenceNewsRequest newsDTO, UUID fsUserId);
+    ReferenceNews toReferenceNewsEntity(CreateReferenceNewsRequest newsDTO, UUID fsUserId, UUID deviceId);
 
     @Mapping(target = "publisherUsername", source = "publisher.username")
     @Mapping(target = "receiverUsername", source = "receiverUsername")
