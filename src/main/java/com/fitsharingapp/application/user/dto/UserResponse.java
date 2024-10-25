@@ -1,6 +1,6 @@
 package com.fitsharingapp.application.user.dto;
 
-import com.fitsharingapp.domain.user.repository.UserGender;
+import com.fitsharingapp.domain.user.UserGender;
 
 import java.time.LocalDate;
 import java.util.UUID;

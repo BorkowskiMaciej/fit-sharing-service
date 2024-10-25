@@ -5,7 +5,7 @@ import com.fitsharingapp.application.news.dto.CreateReferenceNewsRequest;
 import com.fitsharingapp.application.news.dto.NewsResponse;
 import com.fitsharingapp.domain.news.repository.News;
 import com.fitsharingapp.domain.news.repository.ReferenceNews;
-import com.fitsharingapp.domain.user.repository.User;
+import com.fitsharingapp.domain.user.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;

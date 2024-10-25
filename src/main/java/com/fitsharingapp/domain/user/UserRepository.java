@@ -1,4 +1,4 @@
-package com.fitsharingapp.domain.user.repository;
+package com.fitsharingapp.domain.user;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

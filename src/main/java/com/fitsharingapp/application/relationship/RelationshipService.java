@@ -1,13 +1,14 @@
-package com.fitsharingapp.domain.relationship;
+package com.fitsharingapp.application.relationship;
 
 import com.fitsharingapp.application.relationship.dto.FriendsResponse;
 import com.fitsharingapp.application.relationship.dto.RelationshipResponse;
 import com.fitsharingapp.common.ErrorCode;
 import com.fitsharingapp.common.ServiceException;
 import com.fitsharingapp.domain.key.PublicKeyService;
-import com.fitsharingapp.domain.relationship.repository.Relationship;
-import com.fitsharingapp.domain.relationship.repository.RelationshipRepository;
+import com.fitsharingapp.domain.relationship.Relationship;
+import com.fitsharingapp.domain.relationship.RelationshipRepository;
 import com.fitsharingapp.application.user.UserService;
+import com.fitsharingapp.domain.relationship.RelationshipStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,7 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import static com.fitsharingapp.common.ErrorCode.*;
-import static com.fitsharingapp.domain.relationship.repository.RelationshipStatus.*;
+import static com.fitsharingapp.domain.relationship.RelationshipStatus.*;
 
 @Service
 @RequiredArgsConstructor
@@ -45,31 +46,11 @@ public class RelationshipService {
     }
 
     public Relationship acceptRelationship(UUID recipient, UUID relationshipId) {
-        Relationship relationship = relationshipRepository.findById(relationshipId)
-                .orElseThrow(() -> new ServiceException(ErrorCode.RELATIONSHIP_NOT_FOUND));
-        if (!relationship.getRecipient().equals(recipient)) {
-            throw new ServiceException(ErrorCode.USER_IS_NOT_RECIPIENT);
-        }
-        if (!(relationship.getStatus() == PENDING)) {
-            throw new ServiceException(ErrorCode.RELATIONSHIP_HAS_NOT_PENDING_STATUS);
-        }
-        relationship.setStatus(ACCEPTED);
-        relationship.setUpdatedAt(LocalDateTime.now());
-        return relationshipRepository.save(relationship);
+        return changeRelationshipStatus(recipient, relationshipId, ACCEPTED);
     }
 
     public void rejectRelationship(UUID recipient, UUID relationshipId) {
-        Relationship relationship = relationshipRepository.findById(relationshipId)
-                .orElseThrow(() -> new ServiceException(ErrorCode.RELATIONSHIP_NOT_FOUND));
-        if (!relationship.getRecipient().equals(recipient)) {
-            throw new ServiceException(ErrorCode.USER_IS_NOT_RECIPIENT);
-        }
-        if (!(relationship.getStatus() == PENDING)) {
-            throw new ServiceException(ErrorCode.RELATIONSHIP_HAS_NOT_PENDING_STATUS);
-        }
-        relationship.setStatus(REJECTED);
-        relationship.setUpdatedAt(LocalDateTime.now());
-        relationshipRepository.save(relationship);
+        changeRelationshipStatus(recipient, relationshipId, REJECTED);
     }
 
     public Relationship deleteRelationship(UUID fsUserId, UUID relationshipId) {
@@ -86,10 +67,6 @@ public class RelationshipService {
             throw new ServiceException(ErrorCode.CANNOT_DELETE_RELATIONSHIP);
         }
         return relationship;
-    }
-
-    public void deleteAllRelationships(UUID fsUserId) {
-        relationshipRepository.deleteAllBySenderOrRecipient(fsUserId, fsUserId);
     }
 
     public Relationship getActiveRelationship(UUID fsUserId, UUID friendFsUserId) {
@@ -132,20 +109,22 @@ public class RelationshipService {
                 .toList();
     }
 
-    private void validateRelationshipRequest(UUID sender, UUID recipient) {
-        if (sender.equals(recipient)) {
-            throw new ServiceException(ErrorCode.SELF_RELATIONSHIP);
-        }
-        if (relationshipRepository.existsBySenderAndRecipientAndStatus(sender, recipient, ACCEPTED)) {
-            throw new ServiceException(ErrorCode.RELATIONSHIP_ALREADY_EXISTS);
-        }
-        if (relationshipRepository.existsBySenderAndRecipientAndStatus(recipient, sender, PENDING)) {
-            throw new ServiceException(ErrorCode.PENDING_RELATIONSHIP);
-        }
-        if (relationshipRepository.existsBySenderAndRecipientAndStatus(sender, recipient, PENDING)) {
-            throw new ServiceException(ErrorCode.PENDING_RELATIONSHIP);
-        }
-
+    public List<FriendsResponse> getFriends(UUID fsUserId) {
+        return Stream.concat(
+                        relationshipRepository.findAllByRecipientAndStatus(fsUserId, ACCEPTED)
+                                .stream()
+                                .map(Relationship::getSender),
+                        relationshipRepository.findAllBySenderAndStatus(fsUserId, ACCEPTED)
+                                .stream()
+                                .map(Relationship::getRecipient))
+                .flatMap(uuid -> publicKeyService.getPublicKeys(uuid)
+                        .stream()
+                        .map(publicKey -> FriendsResponse.builder()
+                                .fsUserId(uuid)
+                                .publicKey(publicKey.getKey())
+                                .deviceId(publicKey.getDeviceId())
+                                .build()))
+                .toList();
     }
 
     public void validateRelationship(UUID publisherFsUserId, UUID receiverFsUserId) {
@@ -155,22 +134,38 @@ public class RelationshipService {
         }
     }
 
-    public List<FriendsResponse> getFriends(UUID fsUserId) {
-        return Stream.concat(
-                relationshipRepository.findAllByRecipientAndStatus(fsUserId, ACCEPTED)
-                        .stream()
-                        .map(Relationship::getSender),
-                relationshipRepository.findAllBySenderAndStatus(fsUserId, ACCEPTED)
-                        .stream()
-                        .map(Relationship::getRecipient))
-                .flatMap(uuid -> publicKeyService.getPublicKeys(uuid)
-                        .stream()
-                        .map(publicKey -> FriendsResponse.builder()
-                                .fsUserId(uuid)
-                                .publicKey(publicKey.getKey())
-                                .deviceId(publicKey.getDeviceId())
-                                .build()))
-                .toList();
+    public void deleteAllRelationships(UUID fsUserId) {
+        relationshipRepository.deleteAllBySenderOrRecipient(fsUserId, fsUserId);
+    }
+
+    private void validateRelationshipRequest(UUID sender, UUID recipient) {
+        if (sender.equals(recipient)) {
+            throw new ServiceException(ErrorCode.SELF_RELATIONSHIP);
+        }
+        if (relationshipRepository.existsBySenderAndRecipientAndStatus(sender, recipient, ACCEPTED) ||
+                relationshipRepository.existsBySenderAndRecipientAndStatus(recipient, sender, ACCEPTED)) {
+            throw new ServiceException(ErrorCode.RELATIONSHIP_ALREADY_EXISTS);
+        }
+        if (relationshipRepository.existsBySenderAndRecipientAndStatus(recipient, sender, PENDING) ||
+                relationshipRepository.existsBySenderAndRecipientAndStatus(sender, recipient, PENDING)) {
+            throw new ServiceException(ErrorCode.PENDING_RELATIONSHIP);
+        }
+    }
+
+    private Relationship changeRelationshipStatus(UUID recipient, UUID relationshipId, RelationshipStatus newStatus) {
+        Relationship relationship = relationshipRepository.findById(relationshipId)
+                .orElseThrow(() -> new ServiceException(ErrorCode.RELATIONSHIP_NOT_FOUND));
+
+        if (!relationship.getRecipient().equals(recipient)) {
+            throw new ServiceException(ErrorCode.USER_IS_NOT_RECIPIENT);
+        }
+        if (!(relationship.getStatus() == PENDING)) {
+            throw new ServiceException(ErrorCode.RELATIONSHIP_HAS_NOT_PENDING_STATUS);
+        }
+
+        relationship.setStatus(newStatus);
+        relationship.setUpdatedAt(LocalDateTime.now());
+        return relationshipRepository.save(relationship);
     }
 
 }

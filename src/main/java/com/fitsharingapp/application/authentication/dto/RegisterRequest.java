@@ -1,6 +1,6 @@
 package com.fitsharingapp.application.authentication.dto;
 
-import com.fitsharingapp.domain.user.repository.UserGender;
+import com.fitsharingapp.domain.user.UserGender;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

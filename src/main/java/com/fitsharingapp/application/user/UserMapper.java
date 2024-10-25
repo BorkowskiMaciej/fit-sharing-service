@@ -1,8 +1,8 @@
-package com.fitsharingapp.domain.user;
+package com.fitsharingapp.application.user;
 
 import com.fitsharingapp.application.authentication.dto.RegisterRequest;
 import com.fitsharingapp.application.user.dto.UserResponse;
-import com.fitsharingapp.domain.user.repository.User;
+import com.fitsharingapp.domain.user.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;

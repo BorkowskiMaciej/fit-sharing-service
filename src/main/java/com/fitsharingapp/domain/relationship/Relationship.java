@@ -1,4 +1,4 @@
-package com.fitsharingapp.domain.relationship.repository;
+package com.fitsharingapp.domain.relationship;
 
 import jakarta.persistence.*;
 import lombok.*;

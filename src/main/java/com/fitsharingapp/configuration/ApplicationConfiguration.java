@@ -1,7 +1,7 @@
 package com.fitsharingapp.configuration;
 
 import com.fitsharingapp.common.ServiceException;
-import com.fitsharingapp.domain.user.repository.UserRepository;
+import com.fitsharingapp.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

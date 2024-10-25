@@ -6,10 +6,9 @@ import com.fitsharingapp.application.user.dto.UpdateUserRequest;
 import com.fitsharingapp.application.user.dto.UserResponse;
 import com.fitsharingapp.common.ErrorCode;
 import com.fitsharingapp.common.ServiceException;
-import com.fitsharingapp.domain.user.UserMapper;
-import com.fitsharingapp.domain.user.repository.User;
-import com.fitsharingapp.domain.user.repository.UserGender;
-import com.fitsharingapp.domain.user.repository.UserRepository;
+import com.fitsharingapp.domain.user.User;
+import com.fitsharingapp.domain.user.UserGender;
+import com.fitsharingapp.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -40,7 +39,7 @@ public class UserService {
                 .toBuilder()
                 .firstName(userUpdateDTO.firstName())
                 .lastName(userUpdateDTO.lastName())
-                .gender(UserGender.valueOf(userUpdateDTO.gender().toUpperCase()))
+                .gender(UserGender.validateAndGet(userUpdateDTO.gender()))
                 .description(userUpdateDTO.description())
                 .profilePicture(profilePicture)
                 .updatedAt(now())

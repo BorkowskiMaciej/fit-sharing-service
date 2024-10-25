@@ -5,7 +5,7 @@ import com.fitsharingapp.application.user.dto.UpdateUserRequest;
 import com.fitsharingapp.application.user.dto.UserResponse;
 import com.fitsharingapp.domain.key.PublicKeyService;
 import com.fitsharingapp.domain.news.NewsService;
-import com.fitsharingapp.domain.relationship.RelationshipService;
+import com.fitsharingapp.application.relationship.RelationshipService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

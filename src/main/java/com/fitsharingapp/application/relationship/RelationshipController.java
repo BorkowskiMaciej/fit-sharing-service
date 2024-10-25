@@ -3,8 +3,7 @@ package com.fitsharingapp.application.relationship;
 import com.fitsharingapp.application.relationship.dto.FriendsResponse;
 import com.fitsharingapp.application.relationship.dto.RelationshipResponse;
 import com.fitsharingapp.domain.news.NewsService;
-import com.fitsharingapp.domain.relationship.RelationshipService;
-import com.fitsharingapp.domain.relationship.repository.Relationship;
+import com.fitsharingapp.domain.relationship.Relationship;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,7 +30,7 @@ public class RelationshipController {
     }
 
     @PostMapping("/accept/{relationshipId}")
-    @ResponseStatus(ACCEPTED)
+    @ResponseStatus(OK)
     public Relationship acceptRelationshipRequest(
             @RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId,
             @PathVariable UUID relationshipId) {
@@ -39,7 +38,7 @@ public class RelationshipController {
     }
 
     @PostMapping("/reject/{relationshipId}")
-    @ResponseStatus(NO_CONTENT)
+    @ResponseStatus(OK)
     public void rejectRelationshipRequest(
             @RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId,
             @PathVariable UUID relationshipId) {
@@ -63,7 +62,7 @@ public class RelationshipController {
     }
 
     @GetMapping("/accepted")
-    public List<RelationshipResponse> getAcceptedRelationshipRelationships(
+    public List<RelationshipResponse> getAcceptedRelationships(
             @RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId) {
         return relationshipService.getAcceptedRelationships(fsUserId);
     }

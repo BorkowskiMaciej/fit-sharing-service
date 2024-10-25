@@ -1,7 +1,7 @@
 package com.fitsharingapp.application;
 
 import com.fitsharingapp.EnableIntegrationContext;
-import com.fitsharingapp.domain.relationship.RelationshipService;
+import com.fitsharingapp.application.relationship.RelationshipService;
 import com.fitsharingapp.application.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

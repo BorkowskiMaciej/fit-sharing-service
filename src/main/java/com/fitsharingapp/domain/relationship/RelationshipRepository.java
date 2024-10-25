@@ -1,4 +1,4 @@
-package com.fitsharingapp.domain.relationship.repository;
+package com.fitsharingapp.domain.relationship;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

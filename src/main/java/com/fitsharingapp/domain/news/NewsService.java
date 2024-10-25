@@ -8,7 +8,7 @@ import com.fitsharingapp.domain.news.repository.News;
 import com.fitsharingapp.domain.news.repository.NewsRepository;
 import com.fitsharingapp.domain.news.repository.ReferenceNews;
 import com.fitsharingapp.domain.news.repository.ReferenceNewsRepository;
-import com.fitsharingapp.domain.relationship.RelationshipService;
+import com.fitsharingapp.application.relationship.RelationshipService;
 import com.fitsharingapp.application.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;

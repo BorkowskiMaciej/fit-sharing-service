@@ -1,6 +1,6 @@
 package com.fitsharingapp.application.relationship.dto;
 
-import com.fitsharingapp.domain.relationship.repository.RelationshipStatus;
+import com.fitsharingapp.domain.relationship.RelationshipStatus;
 import lombok.Builder;
 
 import java.util.UUID;
