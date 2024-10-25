@@ -1,16 +1,14 @@
 package com.fitsharingapp.domain.user;
 
-import com.fitsharingapp.application.authentication.dto.RegisterRequest;
+import com.fitsharingapp.application.common.validator.RequestValidator;
 import com.fitsharingapp.application.user.dto.UpdatePasswordRequest;
 import com.fitsharingapp.application.user.dto.UpdateUserRequest;
 import com.fitsharingapp.application.user.dto.UserResponse;
 import com.fitsharingapp.common.ErrorCode;
 import com.fitsharingapp.common.ServiceException;
-import com.fitsharingapp.domain.key.PublicKeyService;
 import com.fitsharingapp.domain.user.repository.User;
 import com.fitsharingapp.domain.user.repository.UserGender;
 import com.fitsharingapp.domain.user.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,8 +18,6 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.fitsharingapp.common.ErrorCode.INVALID_OLD_PASSWORD;
-import static com.fitsharingapp.common.ErrorCode.NOT_UNIQUE_USERNAME;
-import static com.fitsharingapp.common.ErrorCode.NOT_UNIQUE_EMAIL;
 import static com.fitsharingapp.common.ErrorCode.USER_NOT_FOUND;
 import static java.time.LocalDateTime.now;
 
@@ -32,7 +28,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
-    private final PublicKeyService publicKeyService;
+    private final RequestValidator requestValidator;
 
     public User getUserById(UUID fsUserId, ErrorCode errorCode) {
         return userRepository.findById(fsUserId)
@@ -58,22 +54,6 @@ public class UserService {
                 .stream()
                 .map(userMapper::toResponse)
                 .toList();
-    }
-
-    @Transactional
-    public UUID createUser(RegisterRequest registerRequest) {
-        if (userRepository.existsByUsername(registerRequest.username())) {
-            throw new ServiceException(NOT_UNIQUE_USERNAME);
-        }
-        if (userRepository.existsByEmail(registerRequest.email())) {
-            throw new ServiceException(NOT_UNIQUE_EMAIL);
-        }
-        RegisterRequest userDtoWithEncodedPassword = registerRequest.toBuilder()
-                .password(passwordEncoder.encode(registerRequest.password()))
-                .build();
-        User user = userRepository.save(userMapper.toEntity(userDtoWithEncodedPassword));
-        publicKeyService.savePublicKey(user.getFsUserId(), registerRequest.deviceId(), registerRequest.publicKey());
-        return user.getFsUserId();
     }
 
     public UserResponse updateUser(UUID fsUserId, UpdateUserRequest userUpdateDTO) {

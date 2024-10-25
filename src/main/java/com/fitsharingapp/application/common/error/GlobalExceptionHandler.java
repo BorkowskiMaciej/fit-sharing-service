@@ -1,4 +1,4 @@
-package com.fitsharingapp.application.error;
+package com.fitsharingapp.application.common.error;
 
 import com.fitsharingapp.common.ServiceException;
 import org.springframework.http.ResponseEntity;

@@ -2,7 +2,7 @@ package com.fitsharingapp.application.filter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fitsharingapp.application.error.ErrorResponse;
+import com.fitsharingapp.application.common.error.ErrorResponse;
 import com.fitsharingapp.common.ServiceException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
