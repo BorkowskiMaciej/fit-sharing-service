@@ -8,9 +8,7 @@ import com.fitsharingapp.domain.news.ReferenceNews;
 import com.fitsharingapp.domain.user.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Named;
 
-import java.util.Base64;
 import java.util.UUID;
 
 @Mapper(componentModel = "spring")
@@ -27,21 +25,15 @@ public interface NewsMapper {
     ReferenceNews toReferenceNewsEntity(CreateReferenceNewsRequest newsDTO, UUID fsUserId, UUID deviceId);
 
     @Mapping(target = "publisherUsername", source = "publisher.username")
-    @Mapping(target = "publisherProfilePicture", source = "publisher.profilePicture", qualifiedByName = "bytesToBase64")
+    @Mapping(target = "publisherProfilePicture", expression = "java(" +
+            "com.fitsharingapp.application.common.Base64Utils.bytesToBase64(publisher.getProfilePicture()))")
     @Mapping(target = "createdAt", source = "news.createdAt")
     NewsResponse toResponse(News news, User publisher);
 
     @Mapping(target = "publisherUsername", source = "publisher.username")
-    @Mapping(target = "publisherProfilePicture", source = "publisher.profilePicture", qualifiedByName = "bytesToBase64")
+    @Mapping(target = "publisherProfilePicture", expression = "java(" +
+            "com.fitsharingapp.application.common.Base64Utils.bytesToBase64(publisher.getProfilePicture()))")
     @Mapping(target = "createdAt", source = "news.createdAt")
     NewsResponse toResponse(ReferenceNews news, User publisher);
-
-    @Named("bytesToBase64")
-    static String bytesToBase64(byte[] imageBytes) {
-        if (imageBytes != null) {
-            return "data:image/png;base64," + Base64.getEncoder().encodeToString(imageBytes);
-        }
-        return null;
-    }
 
 }

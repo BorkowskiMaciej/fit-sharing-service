@@ -1,5 +1,6 @@
 package com.fitsharingapp.application.user;
 
+import com.fitsharingapp.application.common.Base64Utils;
 import com.fitsharingapp.application.common.validator.RequestValidator;
 import com.fitsharingapp.application.user.dto.UpdatePasswordRequest;
 import com.fitsharingapp.application.user.dto.UpdateUserRequest;
@@ -13,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,16 +32,13 @@ public class UserService {
 
     public UserResponse updateUser(UUID fsUserId, UpdateUserRequest userUpdateDTO) {
         requestValidator.validate(userUpdateDTO);
-        byte[] profilePicture = userUpdateDTO.profilePicture() != null
-                ? Base64.getDecoder().decode(userUpdateDTO.profilePicture().split(",")[1])
-                : null;
         User updatedUser = getUserById(fsUserId, USER_NOT_FOUND)
                 .toBuilder()
                 .firstName(userUpdateDTO.firstName())
                 .lastName(userUpdateDTO.lastName())
                 .gender(UserGender.validateAndGet(userUpdateDTO.gender()))
                 .description(userUpdateDTO.description())
-                .profilePicture(profilePicture)
+                .profilePicture(Base64Utils.base64ToBytes(userUpdateDTO.profilePicture()))
                 .updatedAt(now())
                 .build();
         return userMapper.toResponse(userRepository.save(updatedUser));
@@ -76,12 +73,6 @@ public class UserService {
 
     public User getUserById(UUID fsUserId, ErrorCode errorCode) {
         return userRepository.findById(fsUserId)
-                .orElseThrow(() -> new ServiceException(errorCode));
-    }
-
-    public String getUsernameById(UUID fsUserId, ErrorCode errorCode) {
-        return userRepository.findById(fsUserId)
-                .map(User::getUsername)
                 .orElseThrow(() -> new ServiceException(errorCode));
     }
 
