@@ -10,7 +10,6 @@ public record NewsResponse(
         String publisherUsername,
         String publisherProfilePicture,
         UUID receiverFsUserId,
-        String receiverUsername,
         String data,
         LocalDateTime createdAt
 ) {

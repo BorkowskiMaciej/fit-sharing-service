@@ -59,8 +59,7 @@ public class NewsService {
                 .stream()
                 .map(news -> newsMapper.toResponse(
                         news,
-                        userService.getUserById(news.getPublisherFsUserId(), PUBLISHER_NOT_FOUND),
-                        userService.getUsernameById(news.getReceiverFsUserId(), RECEIVER_NOT_FOUND))
+                        userService.getUserById(news.getPublisherFsUserId(), PUBLISHER_NOT_FOUND))
                     )
                 .toList();
     }
@@ -72,8 +71,7 @@ public class NewsService {
                 .stream()
                 .map(news -> newsMapper.toResponse(
                         news,
-                        userService.getUserById(news.getPublisherFsUserId(), PUBLISHER_NOT_FOUND),
-                        userService.getUsernameById(news.getReceiverFsUserId(), RECEIVER_NOT_FOUND))
+                        userService.getUserById(news.getPublisherFsUserId(), PUBLISHER_NOT_FOUND))
                     )
                 .toList();
     }

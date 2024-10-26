@@ -27,10 +27,9 @@ public interface NewsMapper {
     ReferenceNews toReferenceNewsEntity(CreateReferenceNewsRequest newsDTO, UUID fsUserId, UUID deviceId);
 
     @Mapping(target = "publisherUsername", source = "publisher.username")
-    @Mapping(target = "receiverUsername", source = "receiverUsername")
     @Mapping(target = "publisherProfilePicture", source = "publisher.profilePicture", qualifiedByName = "bytesToBase64")
     @Mapping(target = "createdAt", source = "news.createdAt")
-    NewsResponse toResponse(News news, User publisher, String receiverUsername);
+    NewsResponse toResponse(News news, User publisher);
 
     @Mapping(target = "publisherUsername", source = "publisher.username")
     @Mapping(target = "publisherProfilePicture", source = "publisher.profilePicture", qualifiedByName = "bytesToBase64")
