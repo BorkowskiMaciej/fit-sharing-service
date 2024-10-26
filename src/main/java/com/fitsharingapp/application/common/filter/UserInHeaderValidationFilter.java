@@ -1,4 +1,4 @@
-package com.fitsharingapp.application.filter;
+package com.fitsharingapp.application.common.filter;
 
 import com.fitsharingapp.common.ErrorCode;
 import com.fitsharingapp.common.ServiceException;
@@ -22,8 +22,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static com.fitsharingapp.common.Constants.FS_USER_ID_HEADER;
-import static com.fitsharingapp.common.ErrorCode.INVALID_UUID_IN_HEADER;
-import static com.fitsharingapp.common.ErrorCode.MISSING_FS_USER_ID_HEADER;
+import static com.fitsharingapp.common.ErrorCode.*;
 
 @Component
 @Slf4j
@@ -53,7 +52,7 @@ public class UserInHeaderValidationFilter extends OncePerRequestFilter {
 
         String fsUserIdHeader = request.getHeader(FS_USER_ID_HEADER);
         if (fsUserIdHeader == null || fsUserIdHeader.isEmpty()) {
-            throw new ServiceException(MISSING_FS_USER_ID_HEADER);
+            throw ServiceException.withFormattedMessage(MISSING_HEADER, FS_USER_ID_HEADER);
         }
 
         try {

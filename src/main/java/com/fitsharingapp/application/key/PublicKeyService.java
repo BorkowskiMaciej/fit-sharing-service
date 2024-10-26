@@ -1,8 +1,10 @@
-package com.fitsharingapp.domain.key;
+package com.fitsharingapp.application.key;
 
 import com.fitsharingapp.application.key.dto.CreatePublicKeyRequest;
-import com.fitsharingapp.domain.key.repository.PublicKey;
-import com.fitsharingapp.domain.key.repository.PublicKeyRepository;
+import com.fitsharingapp.common.ErrorCode;
+import com.fitsharingapp.common.ServiceException;
+import com.fitsharingapp.domain.key.PublicKey;
+import com.fitsharingapp.domain.key.PublicKeyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -10,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.fitsharingapp.common.ErrorCode.PUBLIC_KEY_ALREADY_EXISTS;
 import static java.time.LocalDateTime.now;
 import static java.util.UUID.randomUUID;
 
@@ -24,6 +27,10 @@ public class PublicKeyService {
     }
 
     public void savePublicKey(UUID fsUserId, UUID deviceId, byte[] publicKey) {
+        getPublicKey(fsUserId, deviceId)
+                .ifPresent(key -> {
+                    throw new ServiceException(PUBLIC_KEY_ALREADY_EXISTS);
+                });
         PublicKey key = PublicKey.builder()
                 .id(randomUUID())
                 .fsUserId(fsUserId)
@@ -34,16 +41,21 @@ public class PublicKeyService {
         publicKeyRepository.save(key);
     }
 
-    public List<PublicKey> getPublicKeys(UUID fsUserId) {
-        return publicKeyRepository.findAllByFsUserId(fsUserId);
+    public Optional<PublicKey> getPublicKey(UUID fsUserId, UUID deviceId) {
+        return publicKeyRepository.findByFsUserIdAndDeviceId(fsUserId, deviceId);
     }
 
     public void deleteKeys(UUID fsUserId) {
         publicKeyRepository.deleteAllByFsUserId(fsUserId);
     }
 
-    public Optional<PublicKey> getPublicKey(UUID fsUserId, UUID deviceId) {
-        return publicKeyRepository.findByFsUserIdAndDeviceId(fsUserId, deviceId);
+    public List<PublicKey> getPublicKeys(UUID fsUserId) {
+        return publicKeyRepository.findAllByFsUserId(fsUserId);
+    }
+
+    public void validateDevice(UUID fsUserId, UUID deviceId, ErrorCode errorCode) {
+        getPublicKey(fsUserId, deviceId)
+                .orElseThrow(() -> new ServiceException(errorCode));
     }
 
 }

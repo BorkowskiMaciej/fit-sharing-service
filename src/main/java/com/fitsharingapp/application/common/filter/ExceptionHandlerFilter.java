@@ -1,4 +1,4 @@
-package com.fitsharingapp.application.filter;
+package com.fitsharingapp.application.common.filter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,7 +25,7 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
         try {
             filterChain.doFilter(request, response);
         } catch (ServiceException e) {
-            ErrorResponse errorResponse = new ErrorResponse(e.getErrorCode().getCode(), e.getErrorCode().getMessage());
+            ErrorResponse errorResponse = new ErrorResponse(e.getErrorCode().getCode(), e.getMessage());
             response.setStatus(e.getErrorCode().getHttpStatus().value());
             response.getWriter().write(convertObjectToJson(errorResponse));
         }

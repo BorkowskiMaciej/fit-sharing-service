@@ -4,7 +4,7 @@ import com.fitsharingapp.application.relationship.dto.FriendsResponse;
 import com.fitsharingapp.application.relationship.dto.RelationshipResponse;
 import com.fitsharingapp.common.ErrorCode;
 import com.fitsharingapp.common.ServiceException;
-import com.fitsharingapp.domain.key.PublicKeyService;
+import com.fitsharingapp.application.key.PublicKeyService;
 import com.fitsharingapp.domain.relationship.Relationship;
 import com.fitsharingapp.domain.relationship.RelationshipRepository;
 import com.fitsharingapp.application.user.UserService;

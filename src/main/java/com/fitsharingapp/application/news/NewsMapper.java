@@ -1,10 +1,10 @@
-package com.fitsharingapp.domain.news;
+package com.fitsharingapp.application.news;
 
 import com.fitsharingapp.application.news.dto.CreateNewsRequest;
 import com.fitsharingapp.application.news.dto.CreateReferenceNewsRequest;
 import com.fitsharingapp.application.news.dto.NewsResponse;
-import com.fitsharingapp.domain.news.repository.News;
-import com.fitsharingapp.domain.news.repository.ReferenceNews;
+import com.fitsharingapp.domain.news.News;
+import com.fitsharingapp.domain.news.ReferenceNews;
 import com.fitsharingapp.domain.user.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

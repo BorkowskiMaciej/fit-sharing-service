@@ -1,4 +1,4 @@
-package com.fitsharingapp.domain.news.repository;
+package com.fitsharingapp.domain.news;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.MongoRepository;

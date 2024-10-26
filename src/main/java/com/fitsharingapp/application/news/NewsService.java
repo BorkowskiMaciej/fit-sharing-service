@@ -1,13 +1,14 @@
-package com.fitsharingapp.domain.news;
+package com.fitsharingapp.application.news;
 
+import com.fitsharingapp.application.common.validator.RequestValidator;
 import com.fitsharingapp.application.news.dto.CreateNewsRequest;
 import com.fitsharingapp.application.news.dto.CreateReferenceNewsRequest;
 import com.fitsharingapp.application.news.dto.NewsResponse;
 import com.fitsharingapp.common.ServiceException;
-import com.fitsharingapp.domain.news.repository.News;
-import com.fitsharingapp.domain.news.repository.NewsRepository;
-import com.fitsharingapp.domain.news.repository.ReferenceNews;
-import com.fitsharingapp.domain.news.repository.ReferenceNewsRepository;
+import com.fitsharingapp.domain.news.News;
+import com.fitsharingapp.domain.news.NewsRepository;
+import com.fitsharingapp.domain.news.ReferenceNews;
+import com.fitsharingapp.domain.news.ReferenceNewsRepository;
 import com.fitsharingapp.application.relationship.RelationshipService;
 import com.fitsharingapp.application.user.UserService;
 import lombok.RequiredArgsConstructor;
@@ -28,20 +29,23 @@ public class NewsService {
     private final NewsMapper newsMapper;
     private final UserService userService;
     private final RelationshipService relationshipService;
+    private final RequestValidator requestValidator;
+    private static final Sort SORT_BY_CREATED_AT = Sort.by(Sort.Order.desc("createdAt"));
 
     public News createNews(UUID fsUserId, CreateNewsRequest newsDTO) {
+        requestValidator.validate(newsDTO);
         userService.validateUser(newsDTO.receiverFsUserId(), RECEIVER_NOT_FOUND);
         relationshipService.validateRelationship(fsUserId, newsDTO.receiverFsUserId());
         return newsRepository.save(newsMapper.toNewsEntity(newsDTO, fsUserId));
     }
 
     public ReferenceNews createReferenceNews(UUID fsUserId, UUID deviceId, CreateReferenceNewsRequest newsDTO) {
+        requestValidator.validate(newsDTO);
         return referenceNewsRepository.save(newsMapper.toReferenceNewsEntity(newsDTO, fsUserId, deviceId));
     }
 
     public List<NewsResponse> getAllPublishedNews(UUID fsUserId, UUID deviceId) {
-        Sort sort = Sort.by(Sort.Order.desc("createdAt"));
-        return referenceNewsRepository.findAllByPublisherFsUserIdAndDeviceId(fsUserId, deviceId, sort)
+        return referenceNewsRepository.findAllByPublisherFsUserIdAndDeviceId(fsUserId, deviceId, SORT_BY_CREATED_AT)
                 .stream()
                 .map(referenceNews -> newsMapper.toResponse(
                         referenceNews,
@@ -51,8 +55,20 @@ public class NewsService {
     }
 
     public List<NewsResponse> getAllReceivedNews(UUID fsUserId, UUID deviceId) {
-        Sort sort = Sort.by(Sort.Order.desc("createdAt"));
-        return newsRepository.findAllByReceiverFsUserIdAndReceiverDeviceId(fsUserId, deviceId, sort)
+        return newsRepository.findAllByReceiverFsUserIdAndReceiverDeviceId(fsUserId, deviceId, SORT_BY_CREATED_AT)
+                .stream()
+                .map(news -> newsMapper.toResponse(
+                        news,
+                        userService.getUserById(news.getPublisherFsUserId(), PUBLISHER_NOT_FOUND),
+                        userService.getUsernameById(news.getReceiverFsUserId(), RECEIVER_NOT_FOUND))
+                    )
+                .toList();
+    }
+
+    public List<NewsResponse> getAllReceivedNewsFromFriend(UUID fsUserId, UUID deviceId, UUID friendFsUserId) {
+        relationshipService.validateRelationship(fsUserId, friendFsUserId);
+        return newsRepository.findAllByPublisherFsUserIdAndReceiverFsUserIdAndReceiverDeviceId(
+                        friendFsUserId, fsUserId, deviceId, SORT_BY_CREATED_AT)
                 .stream()
                 .map(news -> newsMapper.toResponse(
                         news,
@@ -81,19 +97,6 @@ public class NewsService {
     public void deleteNewsForPublisherAndReceiver(UUID sender, UUID recipient) {
         newsRepository.deleteByPublisherFsUserIdAndReceiverFsUserId(sender, recipient);
         newsRepository.deleteByPublisherFsUserIdAndReceiverFsUserId(recipient, sender);
-    }
-
-    public List<NewsResponse> getAllReceivedNewsFromFriend(UUID fsUserId, UUID deviceId, UUID friendFsUserId) {
-        Sort sort = Sort.by(Sort.Order.desc("createdAt"));
-        relationshipService.validateRelationship(fsUserId, friendFsUserId);
-        return newsRepository.findAllByPublisherFsUserIdAndReceiverFsUserIdAndReceiverDeviceId(friendFsUserId, fsUserId, deviceId, sort)
-                .stream()
-                .map(news -> newsMapper.toResponse(
-                        news,
-                        userService.getUserById(news.getPublisherFsUserId(), PUBLISHER_NOT_FOUND),
-                        userService.getUsernameById(news.getReceiverFsUserId(), RECEIVER_NOT_FOUND))
-                    )
-                .toList();
     }
 
 }

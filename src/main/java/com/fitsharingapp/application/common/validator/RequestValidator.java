@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Set;
 
-import static com.fitsharingapp.common.ErrorCode.INVALID_DATA;
+import static com.fitsharingapp.common.ErrorCode.INVALID_DATA_FOR_FIELD;
 
 @Component
 @RequiredArgsConstructor
@@ -19,7 +19,8 @@ public class RequestValidator {
     public <T> void validate(T request) {
         Set<ConstraintViolation<T>> violations = validator.validate(request);
         if (!violations.isEmpty()) {
-            throw ServiceException.withFormattedMessage(INVALID_DATA, violations);
+            ConstraintViolation<T> violation = violations.stream().findFirst().get();
+            throw ServiceException.withFormattedMessage(INVALID_DATA_FOR_FIELD, violation.getPropertyPath(), violation.getMessageTemplate());
         }
     }
 

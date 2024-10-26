@@ -1,4 +1,4 @@
-package com.fitsharingapp.domain.key.repository;
+package com.fitsharingapp.domain.key;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

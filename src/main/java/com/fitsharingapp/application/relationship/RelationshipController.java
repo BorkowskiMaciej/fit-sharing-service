@@ -2,7 +2,7 @@ package com.fitsharingapp.application.relationship;
 
 import com.fitsharingapp.application.relationship.dto.FriendsResponse;
 import com.fitsharingapp.application.relationship.dto.RelationshipResponse;
-import com.fitsharingapp.domain.news.NewsService;
+import com.fitsharingapp.application.news.NewsService;
 import com.fitsharingapp.domain.relationship.Relationship;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

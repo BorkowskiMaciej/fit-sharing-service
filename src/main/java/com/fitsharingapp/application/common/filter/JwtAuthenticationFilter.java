@@ -1,8 +1,9 @@
-package com.fitsharingapp.application.filter;
+package com.fitsharingapp.application.common.filter;
 
 import com.fitsharingapp.common.ServiceException;
 import com.fitsharingapp.security.JwtService;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,8 +25,7 @@ import java.util.Set;
 
 import static com.fitsharingapp.common.Constants.AUTHORIZATION_HEADER;
 import static com.fitsharingapp.common.Constants.AUTHORIZATION_HEADER_PREFIX;
-import static com.fitsharingapp.common.ErrorCode.INVALID_TOKEN_EXPIRED;
-import static com.fitsharingapp.common.ErrorCode.MISSING_AUTHORIZATION_HEADER;
+import static com.fitsharingapp.common.ErrorCode.*;
 
 @Component
 @RequiredArgsConstructor
@@ -54,8 +54,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String authorizationHeader = request.getHeader(AUTHORIZATION_HEADER);
-        if (authorizationHeader == null || !authorizationHeader.startsWith(AUTHORIZATION_HEADER_PREFIX)) {
-            throw new ServiceException(MISSING_AUTHORIZATION_HEADER);
+        if (authorizationHeader == null) {
+            throw ServiceException.withFormattedMessage(MISSING_HEADER, AUTHORIZATION_HEADER);
+        }
+        if (!authorizationHeader.startsWith(AUTHORIZATION_HEADER_PREFIX)) {
+            throw new ServiceException(INVALID_AUTHORIZATION_HEADER);
         }
 
         try {
@@ -79,6 +82,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch (ExpiredJwtException exception) {
             throw new ServiceException(INVALID_TOKEN_EXPIRED);
+        } catch (MalformedJwtException exception) {
+            throw ServiceException.withFormattedMessage(INVALID_TOKEN, exception.getMessage());
         }
     }
 

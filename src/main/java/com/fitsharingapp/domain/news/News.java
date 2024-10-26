@@ -1,4 +1,4 @@
-package com.fitsharingapp.domain.news.repository;
+package com.fitsharingapp.domain.news;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;

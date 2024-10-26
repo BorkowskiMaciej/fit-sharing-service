@@ -3,8 +3,7 @@ package com.fitsharingapp.application.key;
 import com.fitsharingapp.application.key.dto.CreatePublicKeyRequest;
 import com.fitsharingapp.application.key.dto.PublicKeyResponse;
 import com.fitsharingapp.common.ServiceException;
-import com.fitsharingapp.domain.key.PublicKeyService;
-import com.fitsharingapp.domain.key.repository.PublicKey;
+import com.fitsharingapp.domain.key.PublicKey;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,7 +29,7 @@ public class PublicKeyController {
         publicKeyService.savePublicKey(fsUserId, createPublicKeyRequest);
     }
 
-    @GetMapping
+    @GetMapping("/my")
     public PublicKeyResponse getMyPublicKey(
             @RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId,
             @RequestHeader(value = FS_DEVICE_ID_HEADER) UUID deviceId) {

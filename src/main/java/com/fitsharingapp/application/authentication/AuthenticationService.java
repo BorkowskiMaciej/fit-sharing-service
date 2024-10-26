@@ -3,7 +3,7 @@ package com.fitsharingapp.application.authentication;
 import com.fitsharingapp.application.authentication.dto.*;
 import com.fitsharingapp.application.common.validator.RequestValidator;
 import com.fitsharingapp.common.ServiceException;
-import com.fitsharingapp.domain.key.PublicKeyService;
+import com.fitsharingapp.application.key.PublicKeyService;
 import com.fitsharingapp.application.user.UserMapper;
 import com.fitsharingapp.domain.user.User;
 import com.fitsharingapp.domain.user.UserRepository;

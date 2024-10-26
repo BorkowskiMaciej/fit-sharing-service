@@ -1,4 +1,4 @@
-package com.fitsharingapp.domain.news.repository;
+package com.fitsharingapp.domain.news;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;

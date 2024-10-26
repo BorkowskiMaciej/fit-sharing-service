@@ -1,8 +1,9 @@
 package com.fitsharingapp.configuration;
 
-import com.fitsharingapp.application.filter.ExceptionHandlerFilter;
-import com.fitsharingapp.application.filter.UserInHeaderValidationFilter;
-import com.fitsharingapp.application.filter.JwtAuthenticationFilter;
+import com.fitsharingapp.application.common.filter.DeviceInHeaderValidationFilter;
+import com.fitsharingapp.application.common.filter.ExceptionHandlerFilter;
+import com.fitsharingapp.application.common.filter.UserInHeaderValidationFilter;
+import com.fitsharingapp.application.common.filter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +27,7 @@ public class SecurityConfiguration {
     private final AuthenticationProvider authenticationProvider;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final UserInHeaderValidationFilter userInHeaderValidationFilter;
+    private final DeviceInHeaderValidationFilter deviceInHeaderValidationFilter;
     private final ExceptionHandlerFilter exceptionHandlerFilter;
 
     @Bean
@@ -46,7 +48,8 @@ public class SecurityConfiguration {
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(exceptionHandlerFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(jwtAuthenticationFilter, ExceptionHandlerFilter.class)
-                .addFilterAfter(userInHeaderValidationFilter, JwtAuthenticationFilter.class);
+                .addFilterAfter(userInHeaderValidationFilter, JwtAuthenticationFilter.class)
+                .addFilterAfter(deviceInHeaderValidationFilter, UserInHeaderValidationFilter.class);
 
         return http.build();
     }

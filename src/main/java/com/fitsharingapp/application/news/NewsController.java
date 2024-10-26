@@ -3,9 +3,8 @@ package com.fitsharingapp.application.news;
 import com.fitsharingapp.application.news.dto.CreateNewsRequest;
 import com.fitsharingapp.application.news.dto.CreateReferenceNewsRequest;
 import com.fitsharingapp.application.news.dto.NewsResponse;
-import com.fitsharingapp.domain.news.NewsService;
-import com.fitsharingapp.domain.news.repository.News;
-import com.fitsharingapp.domain.news.repository.ReferenceNews;
+import com.fitsharingapp.domain.news.News;
+import com.fitsharingapp.domain.news.ReferenceNews;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

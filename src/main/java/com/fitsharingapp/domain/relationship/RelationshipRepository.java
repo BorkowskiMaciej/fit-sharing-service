@@ -9,6 +9,7 @@ import java.util.*;
 public interface RelationshipRepository extends JpaRepository<Relationship, UUID> {
 
     boolean existsBySenderAndRecipientAndStatus(UUID sender, UUID recipient, RelationshipStatus status);
+
     boolean existsBySenderAndRecipient(UUID sender, UUID recipient);
 
     List<Relationship> findAllByRecipientAndStatus(UUID recipient, RelationshipStatus status);
