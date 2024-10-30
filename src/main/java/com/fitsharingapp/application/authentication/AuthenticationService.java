@@ -54,8 +54,7 @@ public class AuthenticationService {
     public LoginResponse authenticate(LoginRequest input) {
         requestValidator.validate(input);
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(input.username(), input.password()));
-        User user = userRepository.findByUsername(input.username())
-                .orElseThrow(() -> new ServiceException(USER_NOT_FOUND));
+        User user = userRepository.findByUsername(input.username()).orElseThrow();
         return new LoginResponse(
                 user.getFsUserId(),
                 jwtService.generateToken(user),

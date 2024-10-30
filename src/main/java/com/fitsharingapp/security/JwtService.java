@@ -51,6 +51,10 @@ public class JwtService {
         return buildToken(userDetails, resetPasswordJwtExpiration);
     }
 
+    public String generateToken(UserDetails userDetails, Long resetPasswordJwtExpiration) {
+        return buildToken(userDetails, resetPasswordJwtExpiration);
+    }
+
     private String buildToken(
             UserDetails userDetails,
             long expiration
