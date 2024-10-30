@@ -5,6 +5,7 @@ import com.fitsharingapp.common.ErrorCode;
 import com.fitsharingapp.common.ServiceException;
 import com.fitsharingapp.domain.key.PublicKey;
 import com.fitsharingapp.domain.key.PublicKeyRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -45,6 +46,7 @@ public class PublicKeyService {
         return publicKeyRepository.findByFsUserIdAndDeviceId(fsUserId, deviceId);
     }
 
+    @Transactional
     public void deleteKeys(UUID fsUserId) {
         publicKeyRepository.deleteAllByFsUserId(fsUserId);
     }

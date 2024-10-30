@@ -5,6 +5,7 @@ import com.fitsharingapp.application.user.UserMapper;
 import com.fitsharingapp.domain.user.User;
 import com.fitsharingapp.domain.user.UserGender;
 import com.fitsharingapp.domain.user.UserRepository;
+import com.fitsharingapp.security.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -22,6 +23,7 @@ public class TestDataProvider {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     public RegisterRequest createRandomRegisterRequest() {
         String username = "user" + ThreadLocalRandom.current().nextInt(1000, 9999);
@@ -42,6 +44,13 @@ public class TestDataProvider {
 
     public User createAndSaveRandomUser() {
         return userRepository.save(userMapper.toEntity(createRandomRegisterRequest()));
+    }
+
+    public TestUserData createTestUserData() {
+        User user = createAndSaveRandomUser();
+        String authorizationHeader = "Bearer " + jwtService.generateToken(user);
+        UUID deviceId = UUID.randomUUID();
+        return new TestUserData(user, authorizationHeader, deviceId);
     }
 
 

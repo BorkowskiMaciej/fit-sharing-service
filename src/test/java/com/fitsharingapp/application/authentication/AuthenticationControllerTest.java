@@ -276,7 +276,7 @@ public class AuthenticationControllerTest {
         String resetPasswordToken = jwtService.generateResetPasswordToken(registeredUser);
 
         ResetPasswordDataRequest resetPasswordRequest = new ResetPasswordDataRequest(
-                registeredUser.getEmail(), resetPasswordToken, "");
+                registeredUser.getEmail(), resetPasswordToken, null);
 
         webTestClient.post()
                 .uri("/auth/reset-password")
