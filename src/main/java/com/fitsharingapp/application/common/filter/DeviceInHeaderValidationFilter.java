@@ -31,7 +31,7 @@ public class DeviceInHeaderValidationFilter extends OncePerRequestFilter {
     private final PublicKeyService publicKeyService;
 
     static {
-        includedPath.add("/keys/me");
+        includedPath.add("/keys/my");
         includedPath.add("/news/reference");
         includedPath.add("/news/received");
     }

@@ -1,7 +1,7 @@
 package com.fitsharingapp.application.authentication;
 
 import com.fitsharingapp.EnableIntegrationContext;
-import com.fitsharingapp.TestUserProvider;
+import com.fitsharingapp.TestDataProvider;
 import com.fitsharingapp.application.authentication.dto.*;
 import com.fitsharingapp.application.key.PublicKeyService;
 import com.fitsharingapp.domain.key.PublicKey;
@@ -29,7 +29,7 @@ public class AuthenticationControllerTest {
     private WebTestClient webTestClient;
 
     @Autowired
-    private TestUserProvider testUserProvider;
+    private TestDataProvider testDataProvider;
 
     @Autowired
     private JwtService jwtService;
@@ -40,10 +40,9 @@ public class AuthenticationControllerTest {
     @Autowired
     private PublicKeyService publicKeyService;
 
-    // positive tests
     @Test
     void should_RegisterUser_When_Requested() {
-        RegisterRequest request = testUserProvider.createRandomRegisterRequest();
+        RegisterRequest request = testDataProvider.createRandomRegisterRequest();
 
         RegisterResponse response = webTestClient
                 .post()
@@ -68,7 +67,7 @@ public class AuthenticationControllerTest {
 
     @Test
     void should_LoginUser_When_Requested() {
-        User registeredUser = testUserProvider.createAndSaveRandomUser();
+        User registeredUser = testDataProvider.createAndSaveRandomUser();
         LoginRequest request = new LoginRequest(registeredUser.getUsername(), "password");
 
         LoginResponse loginResponse = webTestClient.post()
@@ -95,7 +94,7 @@ public class AuthenticationControllerTest {
 
     @Test
     void should_SendResetPasswordToken_When_Requested() {
-        User registeredUser = testUserProvider.createAndSaveRandomUser();
+        User registeredUser = testDataProvider.createAndSaveRandomUser();
         ResetPasswordRequest request = new ResetPasswordRequest(registeredUser.getEmail());
 
         webTestClient.post()
@@ -109,7 +108,7 @@ public class AuthenticationControllerTest {
 
     @Test
     void should_ResetPassword_When_Requested() {
-        User registeredUser = testUserProvider.createAndSaveRandomUser();
+        User registeredUser = testDataProvider.createAndSaveRandomUser();
         String resetPasswordToken = jwtService.generateResetPasswordToken(registeredUser);
 
         ResetPasswordDataRequest resetPasswordRequest = new ResetPasswordDataRequest(
@@ -134,10 +133,9 @@ public class AuthenticationControllerTest {
                 .isOk();
     }
 
-    // negative tests
     @Test
     void should_ReturnBadRequest_When_SendInvalidRegisterRequest() {
-        RegisterRequest request = testUserProvider.createRandomRegisterRequest()
+        RegisterRequest request = testDataProvider.createRandomRegisterRequest()
                 .toBuilder()
                 .username("")
                 .build();
@@ -158,12 +156,12 @@ public class AuthenticationControllerTest {
 
     @Test
     void should_ReturnBadRequest_When_SendRegisterRequestAndUsernameOrEmailAlreadyExists() {
-        User savedUser = testUserProvider.createAndSaveRandomUser();
-        RegisterRequest request = testUserProvider.createRandomRegisterRequest()
+        User savedUser = testDataProvider.createAndSaveRandomUser();
+        RegisterRequest request = testDataProvider.createRandomRegisterRequest()
                 .toBuilder()
                 .username(savedUser.getUsername())
                 .build();
-        RegisterRequest request2 = testUserProvider.createRandomRegisterRequest()
+        RegisterRequest request2 = testDataProvider.createRandomRegisterRequest()
                 .toBuilder()
                 .email(savedUser.getEmail())
                 .build();
@@ -255,7 +253,7 @@ public class AuthenticationControllerTest {
 
     @Test
     void should_ReturnBadRequest_When_ResetPasswordWithInvalidToken() {
-        User registeredUser = testUserProvider.createAndSaveRandomUser();
+        User registeredUser = testDataProvider.createAndSaveRandomUser();
         String invalidToken = "invalidToken";
 
         ResetPasswordDataRequest resetPasswordRequest = new ResetPasswordDataRequest(
@@ -274,7 +272,7 @@ public class AuthenticationControllerTest {
 
     @Test
     void should_ReturnBadRequest_When_ResetPasswordWithInvalidData() {
-        User registeredUser = testUserProvider.createAndSaveRandomUser();
+        User registeredUser = testDataProvider.createAndSaveRandomUser();
         String resetPasswordToken = jwtService.generateResetPasswordToken(registeredUser);
 
         ResetPasswordDataRequest resetPasswordRequest = new ResetPasswordDataRequest(
@@ -295,7 +293,7 @@ public class AuthenticationControllerTest {
 
     @Test
     void should_ReturnBadRequest_When_ResetPasswordWithExpiredToken() {
-        User registeredUser = testUserProvider.createAndSaveRandomUser();
+        User registeredUser = testDataProvider.createAndSaveRandomUser();
         String expiredToken = jwtService.generateToken(registeredUser, 1L);
 
         ResetPasswordDataRequest resetPasswordRequest = new ResetPasswordDataRequest(

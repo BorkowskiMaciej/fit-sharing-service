@@ -17,7 +17,7 @@ import static java.util.UUID.randomUUID;
 
 @Component
 @RequiredArgsConstructor
-public class TestUserProvider {
+public class TestDataProvider {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
@@ -43,5 +43,7 @@ public class TestUserProvider {
     public User createAndSaveRandomUser() {
         return userRepository.save(userMapper.toEntity(createRandomRegisterRequest()));
     }
+
+
 
 }
