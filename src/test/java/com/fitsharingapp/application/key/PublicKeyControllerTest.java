@@ -42,7 +42,7 @@ public class PublicKeyControllerTest {
         webTestClient.post()
                 .uri("/keys")
                 .header(AUTHORIZATION_HEADER, userData.authorizationHeader())
-                .header(FS_USER_ID_HEADER, userData.user().getFsUserId().toString())
+                .header(FS_USER_ID_HEADER, userData.fsUserIdHeader())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(request)
                 .exchange()
@@ -58,14 +58,15 @@ public class PublicKeyControllerTest {
     @Test
     void should_ReturnMyKey_When_Requested() {
         TestUserData userData = testDataProvider.createTestUserData();
-        publicKeyService.savePublicKey(userData.user().getFsUserId(), userData.deviceId(), PUBLIC_KEY);
+        publicKeyService.savePublicKey(
+                userData.user().getFsUserId(), userData.deviceId(), PUBLIC_KEY);
 
         PublicKeyResponse response = webTestClient
                 .get()
                 .uri("/keys/my")
                 .header(AUTHORIZATION_HEADER, userData.authorizationHeader())
-                .header(FS_USER_ID_HEADER, userData.user().getFsUserId().toString())
-                .header(FS_DEVICE_ID_HEADER, userData.deviceId().toString())
+                .header(FS_USER_ID_HEADER, userData.fsUserIdHeader())
+                .header(FS_DEVICE_ID_HEADER, userData.deviceIdHeader())
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -88,7 +89,7 @@ public class PublicKeyControllerTest {
                 .delete()
                 .uri("/keys")
                 .header(AUTHORIZATION_HEADER, userData.authorizationHeader())
-                .header(FS_USER_ID_HEADER, userData.user().getFsUserId().toString())
+                .header(FS_USER_ID_HEADER, userData.fsUserIdHeader())
                 .exchange()
                 .expectStatus()
                 .isOk();
@@ -105,7 +106,7 @@ public class PublicKeyControllerTest {
         webTestClient.post()
                 .uri("/keys")
                 .header(AUTHORIZATION_HEADER, userData.authorizationHeader())
-                .header(FS_USER_ID_HEADER, userData.user().getFsUserId().toString())
+                .header(FS_USER_ID_HEADER, userData.fsUserIdHeader())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(request)
                 .exchange()
@@ -122,8 +123,8 @@ public class PublicKeyControllerTest {
         webTestClient.get()
                 .uri("/keys/my")
                 .header(AUTHORIZATION_HEADER, userData.authorizationHeader())
-                .header(FS_USER_ID_HEADER, userData.user().getFsUserId().toString())
-                .header(FS_DEVICE_ID_HEADER, userData.deviceId().toString())
+                .header(FS_USER_ID_HEADER, userData.fsUserIdHeader())
+                .header(FS_DEVICE_ID_HEADER, userData.deviceIdHeader())
                 .exchange()
                 .expectStatus()
                 .isNotFound()

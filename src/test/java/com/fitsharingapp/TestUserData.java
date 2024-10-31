@@ -6,7 +6,9 @@ import java.util.UUID;
 
 public record TestUserData(
         User user,
+        String fsUserIdHeader,
         String authorizationHeader,
-        UUID deviceId) {
+        UUID deviceId,
+        String deviceIdHeader) {
 
 }

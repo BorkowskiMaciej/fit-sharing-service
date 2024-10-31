@@ -2,6 +2,9 @@ package com.fitsharingapp;
 
 import com.fitsharingapp.application.authentication.dto.RegisterRequest;
 import com.fitsharingapp.application.user.UserMapper;
+import com.fitsharingapp.domain.relationship.Relationship;
+import com.fitsharingapp.domain.relationship.RelationshipRepository;
+import com.fitsharingapp.domain.relationship.RelationshipStatus;
 import com.fitsharingapp.domain.user.User;
 import com.fitsharingapp.domain.user.UserGender;
 import com.fitsharingapp.domain.user.UserRepository;
@@ -11,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -21,6 +25,7 @@ import static java.util.UUID.randomUUID;
 public class TestDataProvider {
 
     private final UserRepository userRepository;
+    private final RelationshipRepository relationshipRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
@@ -49,10 +54,20 @@ public class TestDataProvider {
     public TestUserData createTestUserData() {
         User user = createAndSaveRandomUser();
         String authorizationHeader = "Bearer " + jwtService.generateToken(user);
-        UUID deviceId = UUID.randomUUID();
-        return new TestUserData(user, authorizationHeader, deviceId);
+        UUID deviceId = randomUUID();
+        String deviceIdHeader = deviceId.toString();
+        return new TestUserData(user, user.getFsUserId().toString(), authorizationHeader, deviceId, deviceIdHeader);
     }
 
-
+    public Relationship createRelationship(UUID senderId, UUID recipientId, RelationshipStatus status) {
+        return relationshipRepository.save(Relationship.builder()
+                .id(randomUUID())
+                .sender(senderId)
+                .recipient(recipientId)
+                .status(status)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build());
+    }
 
 }
