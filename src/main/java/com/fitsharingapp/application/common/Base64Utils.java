@@ -1,7 +1,10 @@
 package com.fitsharingapp.application.common;
 
+import lombok.NoArgsConstructor;
+
 import java.util.Base64;
 
+@NoArgsConstructor
 public class Base64Utils {
 
     public static String bytesToBase64(byte[] imageBytes) {

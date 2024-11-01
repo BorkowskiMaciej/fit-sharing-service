@@ -7,7 +7,6 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
-import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -29,8 +28,6 @@ public class GlobalExceptionHandler {
             serviceException = ServiceException.withFormattedMessage(INVALID_CONTENT_TYPE, ex.getMessage());
         } else if (ex instanceof BadCredentialsException || ex instanceof InternalAuthenticationServiceException) {
             serviceException = new ServiceException(BAD_CREDENTIALS);
-        } else if (ex instanceof MissingRequestHeaderException) {
-            serviceException = ServiceException.withFormattedMessage(MISSING_HEADER, ((MissingRequestHeaderException) ex).getHeaderName());
         } else if (ex instanceof NoResourceFoundException) {
             serviceException = ServiceException.withFormattedMessage(RESOURCE_NOT_FOUND, ((NoResourceFoundException) ex).getResourcePath());
         } else if (ex instanceof MethodArgumentTypeMismatchException) {

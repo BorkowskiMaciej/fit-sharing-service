@@ -40,7 +40,7 @@ public class TestDataProvider {
         UserGender gender = UserGender.OTHER;
         String description = "Description";
         byte[] publicKey = "PUBLIC_KEY".getBytes();
-        String profilePicture = null;
+        String profilePicture = "data:image/png;base64,aaa";
         UUID deviceId = randomUUID();
 
         return new RegisterRequest(username, email, passwordEncoder.encode(password), firstName, lastName, dateOfBirth,
