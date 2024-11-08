@@ -24,6 +24,21 @@ services:
     volumes:
       - mongo-data:/data/db
 
+  fit-sharing-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+      - mongodb
+    environment:
+        SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/fit-sharing-db
+        SPRING_DATASOURCE_USERNAME: postgres
+        SPRING_DATASOURCE_PASSWORD: postgres
+        SPRING_DATA_MONGODB_URI: mongodb://mongo:mongo@mongodb:27017/admin
+
 volumes:
   postgres_data:
   mongo-data:
