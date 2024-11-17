@@ -18,6 +18,8 @@ public class News {
     private UUID receiverFsUserId;
     private UUID receiverDeviceId;
 
+    private Boolean isLiked;
+
     private String data;
     private LocalDateTime createdAt;
 

@@ -38,6 +38,7 @@ services:
         SPRING_DATASOURCE_USERNAME: postgres
         SPRING_DATASOURCE_PASSWORD: postgres
         SPRING_DATA_MONGODB_URI: mongodb://mongo:mongo@mongodb:27017/admin
+        TZ: Europe/Warsaw
 
 volumes:
   postgres_data:

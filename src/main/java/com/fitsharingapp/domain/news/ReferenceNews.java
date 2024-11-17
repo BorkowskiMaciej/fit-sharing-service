@@ -16,6 +16,8 @@ public class ReferenceNews {
     private UUID publisherFsUserId;
     private UUID deviceId;
 
+    private Integer likes;
+
     private String data;
     private LocalDateTime createdAt;
 

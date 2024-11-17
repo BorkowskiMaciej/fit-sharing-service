@@ -11,7 +11,9 @@ public record NewsResponse(
         String publisherProfilePicture,
         UUID receiverFsUserId,
         String data,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        boolean isLiked,
+        int likes
 ) {
 
 }

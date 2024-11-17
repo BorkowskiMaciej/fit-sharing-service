@@ -7,6 +7,7 @@ import com.fitsharingapp.application.key.PublicKeyService;
 import com.fitsharingapp.application.news.dto.CreateNewsRequest;
 import com.fitsharingapp.application.news.dto.CreateReferenceNewsRequest;
 import com.fitsharingapp.application.news.dto.NewsResponse;
+import com.fitsharingapp.domain.news.News;
 import com.fitsharingapp.domain.news.ReferenceNews;
 import com.fitsharingapp.domain.relationship.RelationshipStatus;
 import com.fitsharingapp.domain.user.User;
@@ -20,6 +21,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import static com.fitsharingapp.common.Constants.*;
 import static com.fitsharingapp.common.ErrorCode.RELATIONSHIP_NOT_FOUND;
 import static com.fitsharingapp.common.ErrorCode.USER_IS_NOT_PUBLISHER;
+import static com.fitsharingapp.common.ErrorCode.USER_IS_NOT_RECEIVER;
 import static java.util.UUID.randomUUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -90,6 +92,45 @@ public class NewsControllerTest {
                 .isCreated();
 
         assertThat(newsService.getAllPublishedNews(publisher.user().getFsUserId(), publisher.deviceId())).hasSize(1);
+    }
+
+    @Test
+    void should_LikeAndDislikePost_When_Requested() {
+        CreateReferenceNewsRequest referenceNewsRequest = new CreateReferenceNewsRequest("Data");
+        ReferenceNews referenceNews = newsService.createReferenceNews(publisher.user().getFsUserId(), publisher.deviceId(), referenceNewsRequest);
+
+        CreateNewsRequest newsRequest = new CreateNewsRequest(
+                referenceNews.getId(), receiver.user().getFsUserId(), receiver.deviceId(), "Data");
+        News news = newsService.createNews(publisher.user().getFsUserId(), newsRequest);
+
+        assertThat(newsService.getAllPublishedNews(publisher.user().getFsUserId(), publisher.deviceId()).get(0).likes()).isEqualTo(0);
+        assertThat(newsService.getAllReceivedNews(receiver.user().getFsUserId(), receiver.deviceId()).get(0).isLiked()).isEqualTo(false);
+
+
+        webTestClient.patch()
+                .uri("/news/" + news.getId() + "/like")
+                .header(AUTHORIZATION_HEADER, receiver.authorizationHeader())
+                .header(FS_USER_ID_HEADER, receiver.fsUserIdHeader())
+                .header(FS_DEVICE_ID_HEADER, receiver.deviceId().toString())
+                .exchange()
+                .expectStatus()
+                .isOk();
+
+        assertThat(newsService.getAllPublishedNews(publisher.user().getFsUserId(), publisher.deviceId()).get(0).likes()).isEqualTo(1);
+        assertThat(newsService.getAllReceivedNews(receiver.user().getFsUserId(), receiver.deviceId()).get(0).isLiked()).isEqualTo(true);
+
+        webTestClient.patch()
+                .uri("/news/" + news.getId() + "/like")
+                .header(AUTHORIZATION_HEADER, receiver.authorizationHeader())
+                .header(FS_USER_ID_HEADER, receiver.fsUserIdHeader())
+                .header(FS_DEVICE_ID_HEADER, receiver.deviceId().toString())
+                .exchange()
+                .expectStatus()
+                .isOk();
+
+        assertThat(newsService.getAllPublishedNews(publisher.user().getFsUserId(), publisher.deviceId()).get(0).likes()).isEqualTo(0);
+        assertThat(newsService.getAllReceivedNews(receiver.user().getFsUserId(), receiver.deviceId()).get(0).isLiked()).isEqualTo(false);
+
     }
 
     @Test
@@ -215,6 +256,28 @@ public class NewsControllerTest {
                 .isNotFound()
                 .expectBody()
                 .jsonPath("$.code").isEqualTo(RELATIONSHIP_NOT_FOUND.getCode());
+
+    }
+
+    @Test
+    void should_ReturnBadRequest_When_NotReceiverLikesPost() {
+        CreateReferenceNewsRequest referenceNewsRequest = new CreateReferenceNewsRequest("Data");
+        ReferenceNews referenceNews = newsService.createReferenceNews(publisher.user().getFsUserId(), publisher.deviceId(), referenceNewsRequest);
+
+        CreateNewsRequest newsRequest = new CreateNewsRequest(
+                referenceNews.getId(), receiver.user().getFsUserId(), receiver.deviceId(), "Data");
+        News news = newsService.createNews(publisher.user().getFsUserId(), newsRequest);
+
+        webTestClient.patch()
+                .uri("/news/" + news.getId() + "/like")
+                .header(AUTHORIZATION_HEADER, publisher.authorizationHeader())
+                .header(FS_USER_ID_HEADER, publisher.fsUserIdHeader())
+                .header(FS_DEVICE_ID_HEADER, publisher.deviceId().toString())
+                .exchange()
+                .expectStatus()
+                .isBadRequest()
+                .expectBody()
+                .jsonPath("$.code").isEqualTo(USER_IS_NOT_RECEIVER.getCode());
 
     }
 

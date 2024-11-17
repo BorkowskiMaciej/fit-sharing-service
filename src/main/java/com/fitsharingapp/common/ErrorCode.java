@@ -45,6 +45,7 @@ public enum ErrorCode {
     RECEIVER_NOT_FOUND(HttpStatus.NOT_FOUND, "SERVICE-3000", "Receiver not found."),
     PUBLISHER_NOT_FOUND(HttpStatus.NOT_FOUND, "SERVICE-3001", "Publisher not found."),
     USER_IS_NOT_PUBLISHER(HttpStatus.BAD_REQUEST, "SERVICE-3002", "User is not the publisher of the news."),
+    USER_IS_NOT_RECEIVER(HttpStatus.BAD_REQUEST, "SERVICE-3002", "User is not the receiver of the news."),
 
     // SERVICE-4xxx Keys
     PUBLIC_KEY_NOT_FOUND(HttpStatus.NOT_FOUND, "SERVICE-4000", "Public key not found."),

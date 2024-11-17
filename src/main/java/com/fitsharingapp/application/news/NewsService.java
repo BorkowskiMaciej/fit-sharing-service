@@ -44,6 +44,22 @@ public class NewsService {
         return referenceNewsRepository.save(newsMapper.toReferenceNewsEntity(newsDTO, fsUserId, deviceId));
     }
 
+    public void likeNews(UUID fsUserId, UUID id) {
+        newsRepository.findById(id)
+                .ifPresent(news -> {
+                    if (!news.getReceiverFsUserId().equals(fsUserId)) {
+                        throw new ServiceException(USER_IS_NOT_RECEIVER);
+                    }
+                    news.setIsLiked(!news.getIsLiked());
+                    newsRepository.save(news);
+                    referenceNewsRepository.findById(news.getReferenceNewsId())
+                            .ifPresent(referenceNews -> {
+                                referenceNews.setLikes(news.getIsLiked() ? referenceNews.getLikes() + 1 : referenceNews.getLikes() - 1);
+                                referenceNewsRepository.save(referenceNews);
+                            });
+                });
+    }
+
     public List<NewsResponse> getAllPublishedNews(UUID fsUserId, UUID deviceId) {
         return referenceNewsRepository.findAllByPublisherFsUserIdAndDeviceId(fsUserId, deviceId, SORT_BY_CREATED_AT)
                 .stream()

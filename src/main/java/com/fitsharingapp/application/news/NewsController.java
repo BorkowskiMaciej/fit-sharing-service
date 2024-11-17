@@ -14,6 +14,7 @@ import java.util.UUID;
 import static com.fitsharingapp.common.Constants.FS_DEVICE_ID_HEADER;
 import static com.fitsharingapp.common.Constants.FS_USER_ID_HEADER;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 @RestController
@@ -38,6 +39,14 @@ public class NewsController {
             @RequestHeader(value = FS_DEVICE_ID_HEADER) UUID deviceId,
             @RequestBody CreateReferenceNewsRequest newsDTO) {
         return newsService.createReferenceNews(fsUserId, deviceId, newsDTO);
+    }
+
+    @PatchMapping("/{id}/like")
+    @ResponseStatus(OK)
+    public void likeNews(
+            @RequestHeader(value = FS_USER_ID_HEADER) UUID fsUserId,
+            @PathVariable UUID id) {
+        newsService.likeNews(fsUserId, id);
     }
 
     @GetMapping("/reference")
